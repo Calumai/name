@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>原住民族傳統名字產生器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f3f4f6;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        .pattern-bg {
+            background-color: #ffffff;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        /* Custom Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+        .tab-active {
+            background-color: #0d9488; /* teal-600 */
+            color: white;
+            border-color: #0d9488;
+        }
+        .tab-inactive {
+            background-color: white;
+            color: #4b5563; /* gray-600 */
+            border-color: #e5e7eb; /* gray-200 */
+        }
+        .tab-inactive:hover {
+            background-color: #f9fafb; /* gray-50 */
+        }
+        details > summary {
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <div class="max-w-xl w-full pattern-bg p-8 border-t-8 border-teal-600">
+        <div class="text-center mb-6">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">原住民族名字產生器</h1>
+            <p class="text-gray-500 text-sm">依據《原住民族人名譜》PDF 邏輯生成</p>
+        </div>
+
+        <!-- ⚠️ Important Notice Section -->
+        <div class="mb-8">
+            <details class="bg-orange-50 border border-orange-200 rounded-lg overflow-hidden group">
+                <summary class="flex items-center justify-between p-4 cursor-pointer hover:bg-orange-100 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <span class="flex items-center justify-center w-8 h-8 rounded-full bg-orange-200 text-orange-700">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        </span>
+                        <div class="text-left">
+                            <h3 class="text-sm font-bold text-orange-900">身分保留重要須知 (期限：明年1月5日)</h3>
+                            <p class="text-xs text-orange-700 mt-0.5">針對「因單獨監護取得身分但未改姓」者</p>
+                        </div>
+                    </div>
+                    <span class="text-orange-500 group-open:rotate-180 transition-transform">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </span>
+                </summary>
+                
+                <div class="p-5 border-t border-orange-200 text-sm text-gray-700 bg-white leading-relaxed space-y-4">
+                    <div class="bg-orange-50 p-3 rounded text-orange-800 font-medium">
+                        🚨 若在明年 1 月 5 日前未辦理，將喪失原住民身分！
+                    </div>
+
+                    <div>
+                        <h4 class="font-bold text-gray-900 mb-1">📖 舉個例子（小明的故事）</h4>
+                        <p>想像有一位「陳小明」：</p>
+                        <ul class="list-disc pl-5 mt-1 space-y-1 text-gray-600">
+                            <li>爸爸不是原住民（姓陳），媽媽是原住民。</li>
+                            <li>小明跟著爸爸姓，叫「陳小明」。</li>
+                            <li>後來爸媽離婚了，法院判給媽媽（原住民）單獨監護。</li>
+                        </ul>
+                        <p class="mt-2 text-gray-500 text-xs italic">舊法優惠：因媽媽單獨扶養，就算小明姓「陳」，政府仍給予原住民身分。</p>
+                    </div>
+
+                    <div>
+                        <h4 class="font-bold text-gray-900 mb-1">🚨 怎麼了？</h4>
+                        <p>修法後，身分需跟「姓氏」或「傳統名字」連結。像小明這樣「姓著非原住民爸爸的姓，卻擁有原住民身分」的情況，必須在期限內改變，否則身分（包含小孩的身分）都會被收回。</p>
+                    </div>
+
+                    <div>
+                        <h4 class="font-bold text-teal-700 mb-1">✅ 我們該怎麼做？</h4>
+                        <p>請趕快去戶政事務所做兩件事之一：</p>
+                        <ul class="list-decimal pl-5 mt-1 space-y-1">
+                            <li><strong>改姓：</strong>改成跟媽媽姓（變成「某小明」）。</li>
+                            <li class="bg-teal-50 -mx-1 px-1 py-0.5 rounded"><strong>並列傳統名字：</strong>不改漢姓，但在名字後加上傳統名字（變成「陳小明 <strong>Pawan</strong>」）。<span class="text-teal-600 text-xs">（此產生器可協助您！）</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        <!-- Step 1: Basic Settings (Always Visible) -->
+        <div class="space-y-4 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="tribeSelect" class="block text-sm font-medium text-gray-700 mb-1">1. 選擇族別</label>
+                    <select id="tribeSelect" onchange="handleSettingsChange()" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-lg focus:ring-teal-500 focus:border-teal-500 block p-2.5">
+                        <option value="" disabled selected>請選擇族群</option>
+                        <option value="Amis">阿美族 (Amis)</option>
+                        <option value="Atayal">泰雅族 (Atayal)</option>
+                        <option value="Paiwan">排灣族 (Paiwan)</option>
+                        <option value="Bunun">布農族 (Bunun)</option>
+                        <option value="Puyuma">卑南族 (Puyuma)</option>
+                        <option value="Rukai">魯凱族 (Rukai)</option>
+                        <option value="Tsou">鄒族 (Tsou)</option>
+                        <option value="Saisiyat">賽夏族 (Saisiyat)</option>
+                        <option value="Yami">雅美族 (Yami/Tao)</option>
+                        <option value="Thao">邵族 (Thao)</option>
+                        <option value="Kavalan">噶瑪蘭族 (Kavalan)</option>
+                        <option value="Truku">太魯閣族 (Truku)</option>
+                        <option value="Sakizaya">撒奇萊雅族 (Sakizaya)</option>
+                        <option value="Seediq">賽德克族 (Seediq)</option>
+                        <option value="Hlaalua">拉阿魯哇族 (Hla'alua)</option>
+                        <option value="Kanakanavu">卡那卡那富族 (Kanakanavu)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">2. 選擇性別</label>
+                    <div class="flex space-x-2">
+                        <div class="flex-1">
+                            <input type="radio" id="gender-male" name="gender" value="Male" class="hidden peer" onchange="handleSettingsChange()">
+                            <label for="gender-male" class="block text-center p-2.5 bg-white border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 peer-checked:border-teal-600 peer-checked:text-teal-600 peer-checked:bg-teal-50 transition-all">
+                                男性
+                            </label>
+                        </div>
+                        <div class="flex-1">
+                            <input type="radio" id="gender-female" name="gender" value="Female" class="hidden peer" onchange="handleSettingsChange()">
+                            <label for="gender-female" class="block text-center p-2.5 bg-white border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 peer-checked:border-teal-600 peer-checked:text-teal-600 peer-checked:bg-teal-50 transition-all">
+                                女性
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Mode Selection (Tabs) -->
+        <div id="modeSelection" class="hidden space-y-4">
+            <div class="flex rounded-md shadow-sm" role="group">
+                <button type="button" onclick="switchMode('search')" id="tab-search" class="w-1/2 px-4 py-3 text-sm font-medium border border-gray-200 rounded-l-lg focus:z-10 focus:ring-2 focus:ring-teal-500 tab-inactive transition-colors flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    我有名字，不會拼
+                </button>
+                <button type="button" onclick="switchMode('generate')" id="tab-generate" class="w-1/2 px-4 py-3 text-sm font-medium border border-l-0 border-gray-200 rounded-r-lg focus:z-10 focus:ring-2 focus:ring-teal-500 tab-inactive transition-colors flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                    我要取一個名字
+                </button>
+            </div>
+
+            <!-- Panel A: Search -->
+            <div id="panel-search" class="hidden bg-teal-50 p-5 rounded-lg border border-teal-100 animate-fade-in">
+                <p class="text-sm text-teal-800 mb-3 font-medium">請輸入您名字的開頭字母 (A-Z) 進行查找：</p>
+                <div class="relative mb-3">
+                    <input type="text" id="searchInput" maxlength="1" oninput="filterNames()" placeholder="例如：M" class="uppercase w-full p-3 border border-teal-200 rounded-lg text-center font-bold text-2xl focus:ring-teal-500 focus:border-teal-500 text-gray-700 tracking-wider">
+                </div>
+                
+                <!-- Search Results -->
+                <div id="searchResults" class="custom-scrollbar mt-2 max-h-40 overflow-y-auto flex flex-wrap gap-2 hidden"></div>
+                
+                <div id="selectedNameDisplay" class="mt-4 p-3 bg-white rounded border border-teal-200 hidden">
+                    <div class="text-xs text-gray-500 mb-1">已選擇：</div>
+                    <div class="flex justify-between items-center">
+                        <span id="pickedName" class="font-bold text-lg text-teal-700"></span>
+                        <button onclick="generateFromSearch()" class="bg-teal-600 hover:bg-teal-700 text-white text-xs px-3 py-1.5 rounded transition">
+                            查看完整格式
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel B: Generate -->
+            <div id="panel-generate" class="hidden animate-fade-in">
+                <div class="bg-gray-50 p-6 rounded-lg border border-gray-200 text-center">
+                    <p class="text-gray-600 mb-4 text-sm">系統將依照該族群的傳統命名法則，為您隨機產生一個名字。</p>
+                    <button onclick="generateRandom()" class="w-full text-white bg-teal-600 hover:bg-teal-700 focus:ring-4 focus:ring-teal-300 font-medium rounded-lg text-lg px-5 py-4 text-center transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+                        <span>✨</span> 立即產生名字
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result Display Area -->
+        <div id="resultArea" class="hidden mt-8 pt-6 border-t border-dashed border-gray-300 animate-fade-in">
+            <div class="text-center">
+                <span class="bg-teal-100 text-teal-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded uppercase tracking-wide">Result</span>
+                <h2 id="generatedName" class="text-4xl font-extrabold text-gray-800 mt-4 mb-2 tracking-tight"></h2>
+                
+                <!-- Page Info Badge -->
+                <div class="mb-4">
+                    <span id="pageInfo" class="inline-flex items-center bg-gray-100 text-gray-600 text-xs font-medium px-2.5 py-0.5 rounded-full border border-gray-200">
+                        <svg class="w-3 h-3 me-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"></path></svg>
+                        名字出處：人名譜 P.<span id="pageNum"></span>
+                    </span>
+                </div>
+
+                <p id="tribeLabel" class="text-lg text-teal-600 font-medium mb-4"></p>
+                
+                <div class="bg-yellow-50 rounded-lg p-4 text-left border border-yellow-200">
+                    <h3 class="text-sm font-semibold text-yellow-800 uppercase mb-2 flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        命名結構說明
+                    </h3>
+                    <p id="namingLogic" class="text-gray-700 text-sm leading-relaxed whitespace-pre-line"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="fixed bottom-4 text-center w-full text-gray-400 text-xs">
+        資料來源：依照原住民族委員會之101年度原住民族傳統名字登記文本
+    </footer>
+
+    <script>
+        // 資料庫：包含名字與對應的 PDF 頁碼
+        const namesData = {
+            "Amis": {
+                name: "阿美族",
+                structure: "親子聯名制 (親名後聯)",
+                logic: "傳統為「個人名 + 父/母名」。北部群多聯母名，中部群多聯父名，亦有氏族名。",
+                male: [
+                    {n: "Mayaw", p: 57}, {n: "Kacaw", p: 56}, {n: "Namoh", p: 57}, {n: "Futing", p: 55}, {n: "Calaw", p: 55}, 
+                    {n: "Ofad", p: 57}, {n: "Sera", p: 58}, {n: "Kulas", p: 56}, {n: "Lafoni", p: 56}, {n: "Sawmah", p: 58}, 
+                    {n: "Talod", p: 58}, {n: "Osing", p: 57}, {n: "Masaw", p: 56}, {n: "Looh", p: 56}, {n: "Madi", p: 57},
+                    {n: "Angaw", p: 54}, {n: "Fongal", p: 55}, {n: "Iko", p: 56}, {n: "Karo", p: 56}, {n: "Olam", p: 57}
+                ],
+                female: [
+                    {n: "Panay", p: 61}, {n: "Dongi", p: 60}, {n: "Ipay", p: 60}, {n: "Nakaw", p: 61}, {n: "Rahic", p: 61}, 
+                    {n: "Sawmah", p: 61}, {n: "Lisin", p: 61}, {n: "Falah", p: 60}, {n: "Tipos", p: 62}, {n: "Sera", p: 61}, 
+                    {n: "Kating", p: 60}, {n: "Canglah", p: 60}, {n: "Sayun", p: 61}, {n: "Api", p: 60}, {n: "Afo", p: 59},
+                    {n: "Lahok", p: 60}, {n: "Olaw", p: 61}, {n: "Usay", p: 62}, {n: "Mayaw", p: 59}, {n: "Fuday", p: 60}
+                ],
+                clan: ["Pacidal", "Kakopa", "Fasay", "Cilangasan", "Raranges", "Ciwidian", "Talakop", "Fafokod"]
+            },
+            "Atayal": {
+                name: "泰雅族",
+                structure: "親子聯名制 (親名後聯)",
+                logic: "傳統為「個人名 + 父親名」。\n例如：Watan 來自父親 Tali，全名為 Watan Tali。",
+                male: [
+                    {n: "Watan", p: 167}, {n: "Yawi", p: 168}, {n: "Behuy", p: 153}, {n: "Pasang", p: 159}, {n: "Tali", p: 164}, 
+                    {n: "Temu", p: 165}, {n: "Umin", p: 167}, {n: "Yukan", p: 168}, {n: "Mona", p: 158}, {n: "Walis", p: 167}, 
+                    {n: "Hayung", p: 153}, {n: "Biung", p: 152}, {n: "Kulas", p: 154}, {n: "Pawan", p: 160}, {n: "Tarah", p: 164},
+                    {n: "Batu", p: 151}, {n: "Lahu", p: 154}, {n: "Masa", p: 157}, {n: "Nawi", p: 158}, {n: "Yabu", p: 168}
+                ],
+                female: [
+                    {n: "Yuma", p: 183}, {n: "Sayun", p: 180}, {n: "Rimuy", p: 179}, {n: "Ciwas", p: 171}, {n: "Iwan", p: 172}, 
+                    {n: "Lawa", p: 174}, {n: "Hani", p: 170}, {n: "Pai", p: 176}, {n: "Yaway", p: 182}, {n: "Abus", p: 170}, 
+                    {n: "Sayo", p: 179}, {n: "Pagung", p: 176}, {n: "Lumu", p: 175}, {n: "Yubu", p: 183}, {n: "Robaw", p: 179},
+                    {n: "Aping", p: 170}, {n: "Gagi", p: 172}, {n: "Lawa", p: 174}, {n: "Walis", p: 181}, {n: "Yaba", p: 182}
+                ],
+                clan: []
+            },
+            "Paiwan": {
+                name: "排灣族",
+                structure: "家名制",
+                logic: "傳統為「個人名 + 家屋名」。\n家名通常接在名字後面，或視語境放在前面 (ti 個人名 a lja 家名)。",
+                male: [
+                    {n: "Camak", p: 228}, {n: "Kui", p: 228}, {n: "Takanaw", p: 230}, {n: "Sakinu", p: 230}, {n: "Paler", p: 229}, 
+                    {n: "Giljegiljaw", p: 228}, {n: "Kuliw", p: 228}, {n: "Cegaw", p: 228}, {n: "Ljavakaw", p: 229}, {n: "Puljaljuyan", p: 230}, 
+                    {n: "Muni", p: 229}, {n: "Vuruvur", p: 231}, {n: "Ugu", p: 230}, {n: "Parung", p: 229}, {n: "Zepulj", p: 234},
+                    {n: "Baru", p: 228}, {n: "Drangadrang", p: 228}, {n: "Kaku", p: 228}, {n: "Masegeseg", p: 229}, {n: "Uyan", p: 230}
+                ],
+                female: [
+                    {n: "Muni", p: 232}, {n: "Eleng", p: 231}, {n: "Djepelang", p: 231}, {n: "Dremedreman", p: 231}, {n: "Sauniyaw", p: 233}, 
+                    {n: "Vavauni", p: 234}, {n: "Tjuku", p: 233}, {n: "Ljayum", p: 232}, {n: "Sened", p: 233}, {n: "Muakay", p: 232}, 
+                    {n: "Rulakes", p: 233}, {n: "Kaljalju", p: 231}, {n: "Drenger", p: 231}, {n: "Ivi", p: 231}, {n: "Utjung", p: 234},
+                    {n: "Akay", p: 231}, {n: "Cemedas", p: 231}, {n: "Ljai", p: 232}, {n: "Pau", p: 233}, {n: "Siredaw", p: 233}
+                ],
+                house: ["Tjaljimaraw", "Mavaliv", "Qapulu", "Zingrur", "Kavulungan", "Gadu", "Pacavalj", "Tjuljevekan", "Ruljadeng", "Pakedavai", "Ljavuras", "Vavulengan"]
+            },
+            "Bunun": {
+                name: "布農族",
+                structure: "氏族名制",
+                logic: "傳統為「個人名 + 氏族名」。",
+                male: [
+                    {n: "Biung", p: 66}, {n: "Talum", p: 67}, {n: "Tiang", p: 66}, {n: "Dahu", p: 66}, {n: "Husung", p: 66}, 
+                    {n: "Alang", p: 66}, {n: "Bukun", p: 66}, {n: "Salizan", p: 67}, {n: "Tahai", p: 67}, {n: "Tulbus", p: 67}, 
+                    {n: "Isak", p: 66}, {n: "Tama", p: 67}, {n: "Kavas", p: 66}, {n: "Haisul", p: 66}, {n: "Umas", p: 67},
+                    {n: "Adul", p: 66}, {n: "Balan", p: 66}, {n: "Lavali", p: 66}, {n: "Nabu", p: 66}, {n: "Vilian", p: 67}
+                ],
+                female: [
+                    {n: "Abus", p: 67}, {n: "Ibu", p: 67}, {n: "Savi", p: 67}, {n: "Tanivu", p: 68}, {n: "Langui", p: 67}, 
+                    {n: "Aping", p: 67}, {n: "Aziman", p: 66}, {n: "Puni", p: 67}, {n: "Ali", p: 67}, {n: "Uli", p: 68}, 
+                    {n: "Samingaz", p: 68}, {n: "Hanaivaz", p: 67}, {n: "Ival", p: 67}, {n: "Niun", p: 67}, {n: "Salung", p: 67},
+                    {n: "Akuan", p: 67}, {n: "Kelleng", p: 67}, {n: "Malas", p: 67}, {n: "Savungaz", p: 67}, {n: "Valis", p: 68}
+                ],
+                clan: ["Ispalidav", "Isbukun", "Takistaulan", "Takiludun", "Istanda", "Palalavi", "Takisvilainan", "Istasipal", "Tansikian", "Lamata", "Manququ", "Takihunang"]
+            },
+            "Puyuma": {
+                name: "卑南族",
+                structure: "家名制",
+                logic: "傳統為「個人名 + 家屋名」。",
+                male: [
+                    {n: "Pudrangiyan", p: 85}, {n: "Siyang", p: 86}, {n: "Pabulas", p: 85}, {n: "Kago", p: 84}, {n: "Paelabang", p: 85}, 
+                    {n: "Banad", p: 83}, {n: "Sontok", p: 86}, {n: "Puar", p: 85}, {n: "Kimbaw", p: 84}, {n: "Aung", p: 83}, 
+                    {n: "Haku", p: 83}, {n: "Sagum", p: 85}, {n: "Pangter", p: 85}, {n: "Tingkuy", p: 86}, {n: "Puyal", p: 85},
+                    {n: "Adun", p: 82}, {n: "Bawrul", p: 83}, {n: "Dingsay", p: 83}, {n: "Iban", p: 83}, {n: "Kuras", p: 84}
+                ],
+                female: [
+                    {n: "Senayan", p: 96}, {n: "Kimuy", p: 93}, {n: "Sugu", p: 97}, {n: "Mumu", p: 94}, {n: "Imui", p: 92}, 
+                    {n: "Samingaz", p: 95}, {n: "Hana", p: 92}, {n: "Uli", p: 99}, {n: "Kating", p: 93}, {n: "Pilay", p: 95}, 
+                    {n: "Saya", p: 96}, {n: "Tingting", p: 98}, {n: "Mabay", p: 94}, {n: "Layar", p: 94}, {n: "Hana", p: 91},
+                    {n: "Abe", p: 87}, {n: "Buna", p: 90}, {n: "Dapen", p: 91}, {n: "Iku", p: 92}, {n: "Panay", p: 95}
+                ],
+                house: ["Pasara'at", "Katadrepan", "Mavaliw", "Tarulibak", "Pakaruku", "Tjimeraw", "Arasis", "Papikel", "Temuli", "Saba", "Kipuy"]
+            },
+            "Rukai": {
+                name: "魯凱族",
+                structure: "家名制",
+                logic: "傳統為「個人名 + 家屋名」。",
+                male: [
+                    {n: "Kaleb", p: 125}, {n: "Peleng", p: 131}, {n: "Lravorase", p: 129}, {n: "Cemelesai", p: 124}, {n: "Kadrangilran", p: 125}, 
+                    {n: "Sakinu", p: 131}, {n: "Auvini", p: 124}, {n: "Lavakaw", p: 128}, {n: "Reseres", p: 131}, {n: "Suale", p: 132}, 
+                    {n: "Muakai", p: 129}, {n: "Baru", p: 124}, {n: "Cegaw", p: 125}, {n: "Lwacu", p: 129}, {n: "Vakaw", p: 133},
+                    {n: "Adraw", p: 124}, {n: "Dalru", p: 125}, {n: "Lalau", p: 128}, {n: "Mwakai", p: 130}, {n: "Takanaw", p: 132}
+                ],
+                female: [
+                    {n: "Abus", p: 135}, {n: "Muakai", p: 139}, {n: "Dremedreman", p: 136}, {n: "Sened", p: 140}, {n: "Ljavuras", p: 138}, 
+                    {n: "Kelele", p: 137}, {n: "Ibuk", p: 137}, {n: "Muni", p: 140}, {n: "Eleng", p: 136}, {n: "Samaiai", p: 141}, 
+                    {n: "Lawa", p: 138}, {n: "Kedrekedre", p: 137}, {n: "Lavaus", p: 138}, {n: "Rengreng", p: 140}, {n: "Sauniyau", p: 141},
+                    {n: "Arui", p: 135}, {n: "Cemecem", p: 135}, {n: "Ibu", p: 137}, {n: "Lapi", p: 138}, {n: "Tuku", p: 142}
+                ],
+                house: ["Mavaliv", "Kaviyangan", "Taramas", "Kautu", "Tjaljimaraw", "Palang", "Talus", "Lra'atarok", "Madaralap", "Tarulibak"]
+            },
+            "Tsou": {
+                name: "鄒族",
+                structure: "氏族名制",
+                logic: "傳統為「個人名 + 氏族名」，中間常加語助詞 'e (屬於)。",
+                male: [
+                    {n: "Pasuya", p: 70}, {n: "Mo'o", p: 70}, {n: "Avai", p: 70}, {n: "Voyu", p: 70}, {n: "Yapasuyongu", p: 70}, 
+                    {n: "Tosku", p: 69}, {n: "Uongu", p: 70}, {n: "Fa'ei", p: 70}, {n: "Tibusungu", p: 70}, {n: "Peongsi", p: 69}, 
+                    {n: "Aicayu", p: 70}, {n: "Yatauyungana", p: 70}, {n: "E'ucna", p: 69}, {n: "Atai", p: 70}, {n: "Yaipuku", p: 70}
+                ],
+                female: [
+                    {n: "Tanivu", p: 70}, {n: "Paicu", p: 70}, {n: "Yangui", p: 70}, {n: "Apu'u", p: 70}, {n: "Sayungu", p: 70}, 
+                    {n: "Ku'atu", p: 70}, {n: "Naa'u", p: 70}, {n: "Mo'o", p: 70}, {n: "Upi'i", p: 70}, {n: "Faisu", p: 70}, 
+                    {n: "Akungu", p: 70}, {n: "Inguyu", p: 70}, {n: "Motoyu", p: 70}, {n: "'Akuan", p: 70}
+                ],
+                clan: ["Tapangu", "Tosa", "Peongsi", "Yatauyungana", "Tosku", "E'ucna", "Muknana", "Yakumangana", "Luheacana", "Yasiungu"]
+            },
+            "Saisiyat": {
+                name: "賽夏族",
+                structure: "親子聯名 + 氏族名",
+                logic: "傳統為「個人名 + 父名 + 氏族名」。",
+                male: [
+                    {n: "Tali", p: 147}, {n: "Bawnay", p: 145}, {n: "Kalah", p: 146}, {n: "Obay", p: 148}, {n: "Amay", p: 148}, 
+                    {n: "Yawi", p: 147}, {n: "Lalah", p: 146}, {n: "Umin", p: 148}, {n: "Taro", p: 147}, {n: "Boya", p: 146}, 
+                    {n: "Watan", p: 147}, {n: "Lajo", p: 146}, {n: "Qawil", p: 147}, {n: "Siya", p: 147}, {n: "Mayaw", p: 146},
+                    {n: "Ba:i'", p: 145}, {n: "Kalih", p: 146}, {n: "Pawan", p: 146}, {n: "Siyat", p: 147}, {n: "Yapi'", p: 147}
+                ],
+                female: [
+                    {n: "Maya", p: 149}, {n: "Wali", p: 149}, {n: "Sawa", p: 149}, {n: "Yuma", p: 150}, {n: "Obing", p: 150}, 
+                    {n: "Lawa", p: 149}, {n: "Sayun", p: 149}, {n: "Rimuy", p: 149}, {n: "Pai", p: 149}, {n: "Iwan", p: 149}, 
+                    {n: "Aping", p: 148}, {n: "Hana", p: 149}, {n: "Kumu", p: 149}, {n: "Ciwas", p: 148}, {n: "Siku", p: 149},
+                    {n: "Awin", p: 148}, {n: "Kizaw", p: 148}, {n: "Momi'", p: 149}, {n: "Tapas", p: 149}, {n: "Yaway", p: 149}
+                ],
+                clan: ["Sawan", "Titiyon", "Hayawan", "Karkarang", "Baba:i'", "Tanohila:", "Kaybaybaw", "Tawtawazay"]
+            },
+            "Yami": {
+                name: "雅美族 (達悟族)",
+                structure: "親從子名制 (Teknonymy)",
+                logic: "名字隨生命階段改變（Si + 名、Syaman + 長子名、Syapen + 長孫名）。此處產生「個人名」。",
+                male: [
+                    {n: "Aalag", p: 236}, {n: "Alaen", p: 236}, {n: "Boya", p: 236}, {n: "Cilas", p: 237}, {n: "Gayong", p: 237}, 
+                    {n: "Jigovat", p: 237}, {n: "Kamidasang", p: 240}, {n: "Kasaliw", p: 240}, {n: "Kezas", p: 240}, {n: "Likod", p: 243}, 
+                    {n: "Man'ai", p: 242}, {n: "Mangato", p: 242}, {n: "Mapan", p: 246}, {n: "Omzas", p: 247}, {n: "Sokay", p: 249},
+                    {n: "Aro", p: 236}, {n: "Gatatoan", p: 237}, {n: "Jivang", p: 238}, {n: "Kimoza", p: 240}, {n: "Miyaven", p: 243}
+                ],
+                female: [
+                    {n: "Aatonen", p: 251}, {n: "Alaen", p: 251}, {n: "Alilin", p: 251}, {n: "Cilas", p: 251}, {n: "Gaksang", p: 252}, 
+                    {n: "Gayong", p: 252}, {n: "Gomanit", p: 252}, {n: "Jinaid", p: 252}, {n: "Kadosan", p: 254}, {n: "Kamaten", p: 254}, 
+                    {n: "Lais", p: 255}, {n: "Lipasak", p: 255}, {n: "Mabzak", p: 255}, {n: "Magang", p: 255}, {n: "Nganaen", p: 259},
+                    {n: "Aoman", p: 251}, {n: "Civoya", p: 251}, {n: "Gaziwas", p: 252}, {n: "Jingocil", p: 252}, {n: "Kotan", p: 255}
+                ],
+                clan: []
+            },
+            "Thao": {
+                name: "邵族",
+                structure: "氏族名制",
+                logic: "傳統為「個人名 + 氏族名」。",
+                male: [
+                    {n: "Kilash", p: 78}, {n: "Qata", p: 78}, {n: "Batu", p: 77}, {n: "Pula", p: 78}, {n: "Mashipunut", p: 78}, 
+                    {n: "Tanakyuwan", p: 77}, {n: "Suhut", p: 78}, {n: "Qanshuaz", p: 78}, {n: "Lhkashinawanan", p: 77}, {n: "Ishul", p: 77}, 
+                    {n: "Kumu", p: 78}, {n: "Walis", p: 79}, {n: "Umin", p: 79}, {n: "Amay", p: 77}, {n: "Pawan", p: 78},
+                    {n: "Abish", p: 77}, {n: "Kalaw", p: 77}, {n: "Lahi", p: 78}, {n: "Mu'u", p: 78}, {n: "Tiban", p: 79}
+                ],
+                female: [
+                    {n: "Ishul", p: 79}, {n: "Apin", p: 79}, {n: "Savi", p: 79}, {n: "Puni", p: 79}, {n: "Ali", p: 79}, 
+                    {n: "Qata", p: 79}, {n: "Ibu", p: 79}, {n: "Malas", p: 79}, {n: "Kumu", p: 79}, {n: "Lawa", p: 79}, 
+                    {n: "Sawa", p: 79}, {n: "Yuma", p: 80}, {n: "Abus", p: 79}, {n: "Hana", p: 79}, {n: "Sayun", p: 79},
+                    {n: "Amui", p: 79}, {n: "Iwal", p: 79}, {n: "Lamu", p: 79}, {n: "Maya", p: 79}, {n: "Shapzay", p: 79}
+                ],
+                clan: ["Lhkatafatu", "Lhkapamumu", "Lhkahihian", "Lhkashinawanan", "Shapiz", "Tanakiuwan", "Lhkatanamarutaw"]
+            },
+            "Kavalan": {
+                name: "噶瑪蘭族",
+                structure: "親子聯名制",
+                logic: "傳統為「個人名 + 父/母名」。",
+                male: [
+                    {n: "Buya", p: 71}, {n: "Patu", p: 72}, {n: "Aiyong", p: 71}, {n: "Kulas", p: 71}, {n: "Sincay", p: 72}, 
+                    {n: "Udi", p: 72}, {n: "Rincay", p: 72}, {n: "Hulam", p: 71}, {n: "Baqah", p: 71}, {n: "Aniw", p: 71}, 
+                    {n: "Mayaw", p: 72}, {n: "Ufing", p: 72}, {n: "Ikun", p: 71}, {n: "Patu", p: 72}, {n: "Imas", p: 71},
+                    {n: "Abang", p: 71}, {n: "Batu", p: 71}, {n: "Hure", p: 71}, {n: "Labi", p: 71}, {n: "Utay", p: 72}
+                ],
+                female: [
+                    {n: "Ipay", p: 73}, {n: "Abi", p: 72}, {n: "Imuy", p: 73}, {n: "Upa", p: 73}, {n: "Engi", p: 72}, 
+                    {n: "Rupi", p: 73}, {n: "Siku", p: 73}, {n: "Abas", p: 72}, {n: "Miku", p: 73}, {n: "Umus", p: 73}, 
+                    {n: "Hadec", p: 72}, {n: "Lisin", p: 73}, {n: "Piyac", p: 73}, {n: "Ukit", p: 73}, {n: "Aciyaw", p: 72},
+                    {n: "Aing", p: 72}, {n: "Arik", p: 72}, {n: "Dongi", p: 72}, {n: "Kimi", p: 73}, {n: "Zingay", p: 73}
+                ],
+                clan: []
+            },
+            "Truku": {
+                name: "太魯閣族",
+                structure: "親子聯名制 (親名後聯)",
+                logic: "傳統為「個人名 + 父親名」。\n例如：Walis 來自父親 Pawan，全名為 Walis Pawan。",
+                male: [
+                    {n: "Walis", p: 203}, {n: "Lowking", p: 193}, {n: "Yudaw", p: 204}, {n: "Mona", p: 194}, {n: "Pawan", p: 196}, 
+                    {n: "Teymu", p: 201}, {n: "Umin", p: 203}, {n: "Bakan", p: 186}, {n: "Tali", p: 200}, {n: "Yawi", p: 204}, 
+                    {n: "Suyan", p: 200}, {n: "Takun", p: 200}, {n: "Abis", p: 185}, {n: "Iban", p: 190}, {n: "Kumu", p: 192},
+                    {n: "Bihu", p: 186}, {n: "Hatu", p: 189}, {n: "Kacaw", p: 191}, {n: "Lawbing", p: 193}, {n: "Ukang", p: 202}
+                ],
+                female: [
+                    {n: "Iwan", p: 209}, {n: "Mahung", p: 212}, {n: "Obing", p: 213}, {n: "Yuma", p: 218}, {n: "Ciwas", p: 207}, 
+                    {n: "Pai", p: 213}, {n: "Robaw", p: 213}, {n: "Lawa", p: 211}, {n: "Sawa", p: 215}, {n: "Rimuy", p: 215}, 
+                    {n: "Aping", p: 206}, {n: "Sayun", p: 216}, {n: "Ubing", p: 218}, {n: "Abus", p: 205}, {n: "Hana", p: 209},
+                    {n: "Bakan", p: 206}, {n: "Haci", p: 208}, {n: "Kimi", p: 210}, {n: "Labi", p: 211}, {n: "Yaway", p: 218}
+                ],
+                clan: []
+            },
+            "Sakizaya": {
+                name: "撒奇萊雅族",
+                structure: "親子聯名制",
+                logic: "傳統為「個人名 + 父/母名」。近期亦有推廣「個人名 + 父名 + 氏族(家族)名」。",
+                male: [
+                    {n: "Tiway", p: 266}, {n: "Kalang", p: 265}, {n: "Kumud", p: 265}, {n: "Kaniw", p: 265}, {n: "Mayaw", p: 266}, 
+                    {n: "Tubu", p: 266}, {n: "Saway", p: 266}, {n: "Kulas", p: 265}, {n: "Bunuy", p: 265}, {n: "Sakul", p: 266}, 
+                    {n: "Puhay", p: 266}, {n: "Balah", p: 265}, {n: "Dung", p: 265}, {n: "Kapa'", p: 265}, {n: "Talu", p: 266},
+                    {n: "Bakah", p: 265}, {n: "Cidal", p: 265}, {n: "Halu", p: 265}, {n: "Kacaw", p: 265}, {n: "Sayan", p: 266}
+                ],
+                female: [
+                    {n: "Ipay", p: 267}, {n: "Siku", p: 267}, {n: "Panay", p: 267}, {n: "Dongi", p: 267}, {n: "Lisin", p: 267}, 
+                    {n: "Sayum", p: 267}, {n: "Puhay", p: 267}, {n: "Canglah", p: 266}, {n: "Buting", p: 267}, {n: "Rupi", p: 267}, 
+                    {n: "Mimi", p: 267}, {n: "Aping", p: 266}, {n: "Tipus", p: 267}, {n: "Sabak", p: 267}, {n: "Muli", p: 267},
+                    {n: "Api", p: 266}, {n: "Hana", p: 267}, {n: "Imi", p: 267}, {n: "Kating", p: 267}, {n: "Umi", p: 267}
+                ],
+                clan: ["Sayun", "Dungi", "Sakul", "Cidnay", "Kavali"]
+            },
+            "Seediq": {
+                name: "賽德克族",
+                structure: "親子聯名制 (親名後聯)",
+                logic: "傳統為「個人名 + 父親名」。\n例如：Mona 來自父親 Rudao，全名為 Mona Rudao。",
+                male: [
+                    {n: "Mona", p: 108}, {n: "Rudao", p: 110}, {n: "Pawan", p: 109}, {n: "Walis", p: 111}, {n: "Tado", p: 110}, 
+                    {n: "Temu", p: 110}, {n: "Umin", p: 111}, {n: "Bakan", p: 105}, {n: "Dakis", p: 106}, {n: "Yawi", p: 111}, 
+                    {n: "Suyan", p: 110}, {n: "Piling", p: 109}, {n: "Kuras", p: 107}, {n: "Iban", p: 106}, {n: "Awi", p: 105},
+                    {n: "Baw", p: 105}, {n: "Hageh", p: 105}, {n: "Kumu", p: 107}, {n: "Paso", p: 109}, {n: "Tali", p: 110}
+                ],
+                female: [
+                    {n: "Iwan", p: 113}, {n: "Mahung", p: 113}, {n: "Obing", p: 113}, {n: "Pai", p: 113}, {n: "Lawa", p: 113}, 
+                    {n: "Robaw", p: 114}, {n: "Sawa", p: 114}, {n: "Rimuy", p: 114}, {n: "Aping", p: 112}, {n: "Sayun", p: 114}, 
+                    {n: "Yuma", p: 115}, {n: "Ciwas", p: 112}, {n: "Luby", p: 113}, {n: "Abus", p: 111}, {n: "Ubing", p: 115},
+                    {n: "Bakan", p: 112}, {n: "Hacu", p: 112}, {n: "Kumu", p: 113}, {n: "Labe", p: 113}, {n: "Yaway", p: 115}
+                ],
+                clan: []
+            },
+            "Hlaalua": {
+                name: "拉阿魯哇族",
+                structure: "氏族名制",
+                logic: "傳統為「個人名 + 氏族名」。",
+                male: [
+                    {n: "Amalanamhlʉ", p: 75}, {n: "Hla'ung", p: 75}, {n: "Vatu", p: 75}, {n: "Umi", p: 76}, {n: "Tali", p: 76}, 
+                    {n: "Sula", p: 76}, {n: "Kuli", p: 75}, {n: "Avia", p: 76}, {n: "Caupu", p: 75}, {n: "Hla'uhla", p: 75}, 
+                    {n: "Mu'u", p: 75}, {n: "Pani", p: 75}, {n: "Pasura", p: 75}, {n: "Tautau", p: 76}, {n: "Piatu", p: 75}
+                ],
+                female: [
+                    {n: "Uli", p: 76}, {n: "Savi", p: 76}, {n: "Abus", p: 76}, {n: "Ibu", p: 76}, {n: "Puni", p: 76}, 
+                    {n: "Mani", p: 76}, {n: "Sawa", p: 76}, {n: "Hlaa'u", p: 76}, {n: "Kuatʉ", p: 76}, {n: "Pi'i", p: 76}, 
+                    {n: "Vanau", p: 76}, {n: "'Apu'u", p: 76}, {n: "Rangui", p: 76}, {n: "Hlacauhlu", p: 76}, {n: "Na'apu", p: 76}
+                ],
+                clan: ["Hlaiputana", "Hlakuluhlana", "Hlalangʉana", "Hlapa'ahlica", "Hlauracana", "Kakuana", "Matiurana", "Mu'una", "Piana", "Salapuana", "Savanguana", "Tavavulana"]
+            },
+            "Kanakanavu": {
+                name: "卡那卡那富族",
+                structure: "氏族名制",
+                logic: "傳統為「個人名 + 氏族名」。",
+                male: [
+                    {n: "Pani", p: 222}, {n: "Mu'u", p: 222}, {n: "Ka'angena", p: 221}, {n: "Kotan", p: 222}, {n: "Avia", p: 222}, 
+                    {n: "Cimseeng", p: 222}, {n: "Pa'ʉ", p: 222}, {n: "Pori", p: 222}, {n: "Pusinga", p: 222}, {n: "Riau", p: 222}, 
+                    {n: "'Akori", p: 222}, {n: "'Angai", p: 222}, {n: "'Atai", p: 222}, {n: "'Uku", p: 222}, {n: "'Una", p: 222}
+                ],
+                female: [
+                    {n: "Kani", p: 222}, {n: "Savi", p: 222}, {n: "Abus", p: 222}, {n: "Ibu", p: 222}, {n: "Puni", p: 222}, 
+                    {n: "Mani", p: 222}, {n: "Kai", p: 222}, {n: "Kau", p: 222}, {n: "Kini", p: 222}, {n: "Kiua", p: 222}, 
+                    {n: "Na'u", p: 222}, {n: "Paicʉ", p: 222}, {n: "Vanau", p: 222}, {n: "'Usu", p: 222}, {n: "'Uva", p: 222}
+                ],
+                clan: ["Ka'angena", "Ka'aviana", "Kakapaniana", "Kakapiana", "Kanpangana", "Kanpaniana", "Kapuana", "Na'uracana", "Napaniana", "Naturingana", "Navirangana", "'Ukunuana"]
+            }
+        };
+
+        // Utility
+        function getRandomItem(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        let selectedNameObj = null;
+
+        // UI State Handlers
+        function handleSettingsChange() {
+            const tribeSelect = document.getElementById("tribeSelect");
+            const genderSelect = document.querySelector('input[name="gender"]:checked');
+            const modeSelection = document.getElementById("modeSelection");
+            
+            // Show mode selection only if settings are complete
+            if (tribeSelect.value && genderSelect) {
+                modeSelection.classList.remove("hidden");
+                // Reset states when tribe/gender changes
+                resetAll();
+            }
+        }
+
+        function resetAll() {
+            // Clear inputs and results
+            document.getElementById('searchInput').value = '';
+            document.getElementById('searchResults').innerHTML = '';
+            document.getElementById('selectedNameDisplay').classList.add('hidden');
+            document.getElementById('resultArea').classList.add('hidden');
+            selectedNameObj = null;
+            
+            // If search tab is active, refresh the filter (which will clear results)
+            if (currentMode === 'search') {
+                filterNames();
+            }
+        }
+
+        let currentMode = null;
+
+        function switchMode(mode) {
+            currentMode = mode;
+            const tabSearch = document.getElementById('tab-search');
+            const tabGenerate = document.getElementById('tab-generate');
+            const panelSearch = document.getElementById('panel-search');
+            const panelGenerate = document.getElementById('panel-generate');
+            const resultArea = document.getElementById('resultArea');
+
+            // Toggle Tabs Style
+            if (mode === 'search') {
+                tabSearch.classList.add('tab-active');
+                tabSearch.classList.remove('tab-inactive');
+                tabGenerate.classList.add('tab-inactive');
+                tabGenerate.classList.remove('tab-active');
+                
+                panelSearch.classList.remove('hidden');
+                panelGenerate.classList.add('hidden');
+                
+                // Focus input
+                setTimeout(() => document.getElementById('searchInput').focus(), 100);
+            } else {
+                tabGenerate.classList.add('tab-active');
+                tabGenerate.classList.remove('tab-inactive');
+                tabSearch.classList.add('tab-inactive');
+                tabSearch.classList.remove('tab-active');
+                
+                panelSearch.classList.add('hidden');
+                panelGenerate.classList.remove('hidden');
+            }
+            
+            // Hide result area when switching modes to avoid confusion
+            resultArea.classList.add('hidden');
+        }
+
+        // Logic for "Search" Mode
+        function filterNames() {
+            const input = document.getElementById('searchInput').value.toUpperCase();
+            const resultsDiv = document.getElementById('searchResults');
+            const tribeSelect = document.getElementById("tribeSelect");
+            const genderSelect = document.querySelector('input[name="gender"]:checked');
+
+            if (!tribeSelect.value || !genderSelect) return;
+
+            if (input.length === 0) {
+                resultsDiv.classList.add('hidden');
+                return;
+            }
+
+            const tribeData = namesData[tribeSelect.value];
+            const nameList = genderSelect.value === "Male" ? tribeData.male : tribeData.female;
+
+            const filtered = nameList.filter(item => item.n.toUpperCase().startsWith(input));
+
+            resultsDiv.innerHTML = '';
+            
+            if (filtered.length > 0) {
+                resultsDiv.classList.remove('hidden');
+                filtered.forEach(item => {
+                    const tag = document.createElement('button');
+                    tag.className = "bg-white border border-teal-200 text-teal-700 px-3 py-1 rounded-full text-sm hover:bg-teal-100 hover:border-teal-300 transition shadow-sm";
+                    tag.innerText = item.n;
+                    tag.onclick = () => pickName(item);
+                    resultsDiv.appendChild(tag);
+                });
+            } else {
+                resultsDiv.innerHTML = '<span class="text-sm text-gray-400 w-full text-center py-2">沒有找到符合的名字</span>';
+                resultsDiv.classList.remove('hidden');
+            }
+        }
+
+        function pickName(item) {
+            selectedNameObj = item;
+            document.getElementById('pickedName').innerText = item.n;
+            document.getElementById('selectedNameDisplay').classList.remove('hidden');
+            // document.getElementById('searchResults').classList.add('hidden'); // Optional: hide list after pick
+        }
+
+        function generateFromSearch() {
+            if (!selectedNameObj) return;
+            processGeneration(selectedNameObj);
+        }
+
+        // Logic for "Generate" Mode
+        function generateRandom() {
+            const tribeSelect = document.getElementById("tribeSelect");
+            const genderSelect = document.querySelector('input[name="gender"]:checked');
+            
+            if (!tribeSelect.value || !genderSelect) {
+                alert("請先完成族別與性別設定！");
+                return;
+            }
+
+            const tribeData = namesData[tribeSelect.value];
+            const nameList = genderSelect.value === "Male" ? tribeData.male : tribeData.female;
+            const randomObj = getRandomItem(nameList);
+            
+            processGeneration(randomObj);
+        }
+
+        // Core Generation Logic
+        function processGeneration(personalNameObj) {
+            const tribeSelect = document.getElementById("tribeSelect");
+            const genderSelect = document.querySelector('input[name="gender"]:checked');
+            const resultArea = document.getElementById("resultArea");
+            const generatedNameElement = document.getElementById("generatedName");
+            const tribeLabelElement = document.getElementById("tribeLabel");
+            const namingLogicElement = document.getElementById("namingLogic");
+            const pageNumElement = document.getElementById("pageNum");
+
+            const tribeKey = tribeSelect.value;
+            const gender = genderSelect.value;
+            const tribeData = namesData[tribeKey];
+            
+            let personalName = personalNameObj.n;
+            let pageNum = personalNameObj.p;
+            
+            let finalName = "";
+            let logicText = tribeData.logic;
+
+            // Logic based on PDF structures
+            if (tribeKey === "Amis" || tribeKey === "Atayal" || tribeKey === "Seediq" || tribeKey === "Truku" || tribeKey === "Kavalan" || tribeKey === "Sakizaya") {
+                // Parent Linking
+                let parentName;
+                if (tribeKey === "Amis") {
+                     // Amis random parent
+                     let parentObj = Math.random() > 0.5 ? getRandomItem(tribeData.male) : getRandomItem(tribeData.female);
+                     parentName = parentObj.n;
+                } else {
+                     // Patrilineal mostly
+                     let parentObj = getRandomItem(tribeData.male);
+                     parentName = parentObj.n;
+                }
+                
+                // Avoid duplicate names
+                while (parentName === personalName) {
+                    parentName = getRandomItem(tribeData.male).n;
+                }
+
+                if (tribeKey === "Saisiyat") {
+                    let clanName = getRandomItem(tribeData.clan);
+                    finalName = `${personalName} ${parentName} ${clanName}`;
+                    logicText += `\n\n📝 範例格式：個人名 + 父名 + 氏族名\n(${personalName} ${parentName} ${clanName})`;
+                } else {
+                    finalName = `${personalName} ${parentName}`;
+                    logicText += `\n\n📝 範例格式：個人名 + 親名\n(${personalName} ${parentName})`;
+                }
+
+            } else if (tribeKey === "Bunun" || tribeKey === "Tsou" || tribeKey === "Thao" || tribeKey === "Hlaalua" || tribeKey === "Kanakanavu") {
+                // Clan System
+                let clanName = getRandomItem(tribeData.clan);
+                finalName = `${personalName} ${clanName}`;
+                logicText += `\n\n📝 範例格式：個人名 + 氏族名\n(${personalName} ${clanName})`;
+
+            } else if (tribeKey === "Paiwan" || tribeKey === "Rukai" || tribeKey === "Puyuma") {
+                // House Name System
+                let houseName = getRandomItem(tribeData.house);
+                finalName = `${personalName} ${houseName}`;
+                logicText += `\n\n📝 範例格式：個人名 + 家屋名\n(${personalName} ${houseName})`;
+
+            } else if (tribeKey === "Yami") {
+                if (!personalName.startsWith("Si ") && !personalName.startsWith("Sy")) {
+                    finalName = "Si " + personalName;
+                } else {
+                    finalName = personalName;
+                }
+                logicText += `\n\n📝 範例格式：Si + 個人名\n(${finalName})`;
+            }
+
+            // Display Results
+            generatedNameElement.textContent = finalName;
+            tribeLabelElement.textContent = `${tribeData.name} - ${gender === "Male" ? "男性" : "女性"}`;
+            namingLogicElement.innerText = logicText;
+            pageNumElement.textContent = pageNum;
+            
+            resultArea.classList.remove("hidden");
+            
+            // Smooth scroll to result
+            resultArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    </script>
+    
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+    </style>
+</body>
+</html>
