@@ -3,23 +3,31 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Codex Chrome 指令卡片</title>
+  <title>AI 網頁練習基地</title>
   <style>
     :root {
       color-scheme: light;
-      --bg: #f7f5ef;
+      --bg: #f6f4ef;
       --ink: #202124;
-      --muted: #62615c;
-      --line: #ded9cd;
+      --muted: #66645e;
+      --line: #ddd6c8;
       --panel: #fffdf8;
       --accent: #0f766e;
-      --accent-2: #9a3412;
-      --chip: #e8f4f1;
-      --shadow: 0 14px 36px rgba(53, 46, 35, 0.10);
+      --accent-dark: #0b5f59;
+      --warn: #9a3412;
+      --blue: #1d4ed8;
+      --green-soft: #e6f3ef;
+      --orange-soft: #fff1e7;
+      --blue-soft: #eaf0ff;
+      --shadow: 0 14px 34px rgba(41, 37, 29, 0.10);
     }
 
     * {
       box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
     }
 
     body {
@@ -30,13 +38,13 @@
       line-height: 1.55;
     }
 
+    a {
+      color: inherit;
+    }
+
     header {
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      background: rgba(247, 245, 239, 0.94);
-      backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--line);
+      background: var(--panel);
     }
 
     .wrap {
@@ -44,24 +52,205 @@
       margin: 0 auto;
     }
 
-    .topbar {
+    .hero {
       display: grid;
-      grid-template-columns: 1fr minmax(220px, 360px);
-      gap: 16px;
-      align-items: center;
-      padding: 18px 0;
+      grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.8fr);
+      gap: 24px;
+      align-items: end;
+      padding: 34px 0 26px;
     }
 
     h1 {
       margin: 0;
-      font-size: clamp(24px, 4vw, 42px);
+      font-size: clamp(30px, 5vw, 58px);
+      line-height: 1.05;
       letter-spacing: 0;
     }
 
-    .sub {
-      margin: 6px 0 0;
+    .lead {
+      margin: 14px 0 0;
       color: var(--muted);
-      font-size: 15px;
+      font-size: 17px;
+      max-width: 720px;
+    }
+
+    .today {
+      background: var(--green-soft);
+      border: 1px solid #bbd9d1;
+      border-radius: 8px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .today h2,
+    .section-title h2,
+    .card h3 {
+      margin: 0;
+      letter-spacing: 0;
+    }
+
+    .today p {
+      margin: 10px 0 0;
+      color: var(--muted);
+    }
+
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(246, 244, 239, 0.94);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .nav-inner {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 12px 0;
+    }
+
+    .nav a,
+    .pill,
+    .tab,
+    .copy {
+      min-height: 40px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: #fff;
+      padding: 9px 13px;
+      text-decoration: none;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .nav a:hover,
+    .tab[aria-pressed="true"] {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+
+    main {
+      padding: 26px 0 56px;
+    }
+
+    section {
+      scroll-margin-top: 78px;
+      margin-top: 28px;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+
+    .section-title p {
+      margin: 4px 0 0;
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .wide-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+      gap: 16px;
+    }
+
+    .card,
+    .prompt-panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    .card {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .metric {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .metric div {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 28px;
+      color: var(--accent-dark);
+    }
+
+    .tool-card {
+      min-height: 210px;
+    }
+
+    .status {
+      width: fit-content;
+      max-width: 100%;
+      border-radius: 999px;
+      padding: 4px 9px;
+      font-size: 13px;
+      font-weight: 700;
+      background: var(--blue-soft);
+      color: var(--blue);
+    }
+
+    .status.done {
+      background: var(--green-soft);
+      color: var(--accent-dark);
+    }
+
+    .status.next {
+      background: var(--orange-soft);
+      color: var(--warn);
+    }
+
+    pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      background: #222;
+      color: #fffaf0;
+      border-radius: 8px;
+      padding: 14px;
+      font-size: 14px;
+      overflow: auto;
+    }
+
+    .prompt-panel {
+      display: grid;
+      gap: 12px;
+    }
+
+    .prompt-top {
+      display: grid;
+      grid-template-columns: 1fr minmax(220px, 320px);
+      gap: 12px;
+      align-items: center;
     }
 
     .search {
@@ -75,109 +264,47 @@
       color: var(--ink);
     }
 
-    main {
-      padding: 28px 0 56px;
-    }
-
     .tabs {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin-bottom: 22px;
-    }
-
-    .tab {
-      border: 1px solid var(--line);
-      background: #fff;
-      color: var(--ink);
-      border-radius: 999px;
-      padding: 9px 13px;
-      cursor: pointer;
-      font: inherit;
-      min-height: 40px;
-    }
-
-    .tab[aria-pressed="true"] {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: #fff;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 16px;
-    }
-
-    .card {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      box-shadow: var(--shadow);
-      padding: 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      min-height: 220px;
-    }
-
-    .card h2 {
-      margin: 0;
-      font-size: 18px;
-      letter-spacing: 0;
-    }
-
-    .tag {
-      width: fit-content;
-      max-width: 100%;
-      border-radius: 999px;
-      background: var(--chip);
-      color: #0b5f59;
-      padding: 4px 9px;
-      font-size: 13px;
-      font-weight: 700;
-    }
-
-    pre {
-      margin: 0;
-      white-space: pre-wrap;
-      word-break: break-word;
-      background: #232323;
-      color: #fffaf0;
-      border-radius: 8px;
-      padding: 14px;
-      font-size: 14px;
-      flex: 1;
-      overflow: auto;
-    }
-
-    .actions {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      justify-content: space-between;
     }
 
     .copy {
-      border: 0;
-      background: var(--accent-2);
+      width: fit-content;
+      background: var(--warn);
+      border-color: var(--warn);
       color: white;
-      border-radius: 8px;
-      min-height: 40px;
-      padding: 9px 13px;
-      cursor: pointer;
-      font: inherit;
       font-weight: 700;
     }
 
-    .hint {
+    .checklist {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 10px;
+    }
+
+    .checklist li {
+      display: grid;
+      grid-template-columns: 26px 1fr;
+      gap: 8px;
+      align-items: start;
       color: var(--muted);
-      font-size: 13px;
+    }
+
+    .box {
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 2px solid var(--accent);
+      margin-top: 2px;
     }
 
     .empty {
       display: none;
-      padding: 36px;
+      padding: 26px;
       border: 1px dashed var(--line);
       border-radius: 8px;
       text-align: center;
@@ -185,9 +312,22 @@
       background: rgba(255, 255, 255, 0.5);
     }
 
-    @media (max-width: 720px) {
-      .topbar {
+    footer {
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      padding: 22px 0;
+      background: var(--panel);
+    }
+
+    @media (max-width: 820px) {
+      .hero,
+      .wide-grid,
+      .prompt-top {
         grid-template-columns: 1fr;
+      }
+
+      .metric {
+        grid-template-columns: repeat(2, 1fr);
       }
 
       .wrap {
@@ -198,30 +338,164 @@
 </head>
 <body>
   <header>
-    <div class="wrap topbar">
+    <div class="wrap hero">
       <div>
-        <h1>Codex Chrome 指令卡片</h1>
-        <p class="sub">把常用指令放在同一頁，需要時搜尋、分類瀏覽、快速複製。</p>
+        <h1>AI 網頁練習基地</h1>
+        <p class="lead">每天用不同 AI 協作做一個小改版，把工具、指令和成果都累積在這一頁。這裡是你的首頁、練習筆記和作品索引。</p>
       </div>
-      <input id="search" class="search" type="search" placeholder="搜尋：試算表、填表、測試、比價..." aria-label="搜尋指令">
+      <aside class="today">
+        <h2>今日任務</h2>
+        <p>把一個常用 prompt 變成可複製卡片，並記錄你用了哪些 AI、各自負責什麼。</p>
+      </aside>
     </div>
   </header>
 
-  <main class="wrap">
-    <nav class="tabs" aria-label="指令分類">
-      <button class="tab" type="button" data-filter="all" aria-pressed="true">全部</button>
-      <button class="tab" type="button" data-filter="基本">基本</button>
-      <button class="tab" type="button" data-filter="試算表">試算表</button>
-      <button class="tab" type="button" data-filter="填表">填表</button>
-      <button class="tab" type="button" data-filter="後台">後台</button>
-      <button class="tab" type="button" data-filter="測試">網站測試</button>
-      <button class="tab" type="button" data-filter="研究">研究整理</button>
-      <button class="tab" type="button" data-filter="安全">確認再動作</button>
-    </nav>
+  <nav class="nav" aria-label="首頁導覽">
+    <div class="wrap nav-inner">
+      <a href="#dashboard">練習儀表板</a>
+      <a href="#tools">小工具區</a>
+      <a href="#prompts">Codex Chrome 指令庫</a>
+      <a href="#projects">練習成果</a>
+      <a href="#routine">每日流程</a>
+    </div>
+  </nav>
 
-    <section id="cards" class="grid" aria-live="polite"></section>
-    <div id="empty" class="empty">找不到符合的指令，換個關鍵字試試。</div>
+  <main class="wrap">
+    <section id="dashboard">
+      <div class="section-title">
+        <div>
+          <h2>練習儀表板</h2>
+          <p>用很小的單位累積，不靠靈感，靠節奏。</p>
+        </div>
+      </div>
+      <div class="metric" aria-label="練習統計">
+        <div><strong>1</strong><span>已完成工具</span></div>
+        <div><strong>28</strong><span>可複製指令</span></div>
+        <div><strong>20-40</strong><span>每日分鐘</span></div>
+        <div><strong>7</strong><span>第一週任務</span></div>
+      </div>
+    </section>
+
+    <section id="tools">
+      <div class="section-title">
+        <div>
+          <h2>小工具區</h2>
+          <p>每個工具都可以是一個練習題：先做能用，再做漂亮，再做可維護。</p>
+        </div>
+      </div>
+      <div class="grid">
+        <article class="card tool-card">
+          <span class="status done">已完成</span>
+          <h3>Codex Chrome 指令庫</h3>
+          <p>分類、搜尋、複製常用 Chrome 操作指令。今天的首頁從這個工具開始長出來。</p>
+          <a class="pill" href="#prompts">前往指令庫</a>
+        </article>
+        <article class="card tool-card">
+          <span class="status next">下一步</span>
+          <h3>Prompt 產生器</h3>
+          <p>輸入任務、資料位置、限制條件，自動組出適合交給 Codex 或 Gemini 的指令。</p>
+          <button class="pill" type="button" disabled>待製作</button>
+        </article>
+        <article class="card tool-card">
+          <span class="status next">下一步</span>
+          <h3>作品卡片產生器</h3>
+          <p>每次練習後填入名稱、學到的事、連結，直接生成一張成果卡片。</p>
+          <button class="pill" type="button" disabled>待製作</button>
+        </article>
+      </div>
+    </section>
+
+    <section id="prompts">
+      <div class="section-title">
+        <div>
+          <h2>Codex Chrome 指令庫</h2>
+          <p>需要操作瀏覽器、測試網頁或整理資料時，從這裡挑一張卡片複製。</p>
+        </div>
+      </div>
+      <div class="prompt-panel">
+        <div class="prompt-top">
+          <div class="tabs" aria-label="指令分類">
+            <button class="tab" type="button" data-filter="all" aria-pressed="true">全部</button>
+            <button class="tab" type="button" data-filter="基本">基本</button>
+            <button class="tab" type="button" data-filter="試算表">試算表</button>
+            <button class="tab" type="button" data-filter="填表">填表</button>
+            <button class="tab" type="button" data-filter="後台">後台</button>
+            <button class="tab" type="button" data-filter="測試">網站測試</button>
+            <button class="tab" type="button" data-filter="研究">研究整理</button>
+            <button class="tab" type="button" data-filter="安全">確認再動作</button>
+          </div>
+          <input id="search" class="search" type="search" placeholder="搜尋：試算表、填表、測試、比價..." aria-label="搜尋指令">
+        </div>
+        <section id="cards" class="grid" aria-live="polite"></section>
+        <div id="empty" class="empty">找不到符合的指令，換個關鍵字試試。</div>
+      </div>
+    </section>
+
+    <section id="projects">
+      <div class="section-title">
+        <div>
+          <h2>練習成果</h2>
+          <p>每完成一次小任務，就把成果補到這裡。它會慢慢變成你的作品集。</p>
+        </div>
+      </div>
+      <div class="grid">
+        <article class="card">
+          <span class="status done">Day 1</span>
+          <h3>AI 網頁練習首頁</h3>
+          <p>把原本的指令卡片頁升級成首頁，包含小工具入口、成果區、每日流程和指令庫。</p>
+          <pre>使用 AI：
+Codex：改版與部署
+Chrome：GitHub 網頁提交
+
+學到：
+小工具首頁要先有導航、狀態和成果紀錄。</pre>
+        </article>
+        <article class="card">
+          <span class="status next">待新增</span>
+          <h3>明日作品卡</h3>
+          <p>明天完成任務後，把工具名稱、網址、學到的 prompt 技巧寫進來。</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="routine">
+      <div class="section-title">
+        <div>
+          <h2>每日流程</h2>
+          <p>每次練習都照這個順序走，讓多個 AI 分工更穩。</p>
+        </div>
+      </div>
+      <div class="wide-grid">
+        <article class="card">
+          <h3>20-40 分鐘流程</h3>
+          <ul class="checklist">
+            <li><span class="box"></span><span>選一個很小的功能，例如新增一張成果卡、改善搜尋、做一個表單。</span></li>
+            <li><span class="box"></span><span>先請一個 AI 幫你拆需求，再請另一個 AI 產出 UI 或文字。</span></li>
+            <li><span class="box"></span><span>交給 Codex 實作、測試、推到 GitHub Pages。</span></li>
+            <li><span class="box"></span><span>把今天學到的 prompt 寫進成果區。</span></li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>萬用練習指令</h3>
+          <pre id="dailyPrompt">我正在練習用多個 AI 協作製作前端網頁。
+請幫我把今天的任務拆成：
+1. 需求澄清
+2. UI/內容設計
+3. Codex 實作指令
+4. 測試清單
+5. 要記錄到首頁的成果文字
+
+今天任務：＿＿＿
+限制：20-40 分鐘內完成，先求能用，再求好看。</pre>
+          <button class="copy" type="button" data-copy-target="dailyPrompt">複製每日指令</button>
+        </article>
+      </div>
+    </section>
   </main>
+
+  <footer>
+    <div class="wrap">AI 網頁練習基地 · 每天一個小工具，每次留下一張成果卡。</div>
+  </footer>
 
   <script>
     const prompts = [
@@ -271,22 +545,15 @@
 
       cards.innerHTML = filtered.map(([category, title, text], index) => `
         <article class="card">
-          <span class="tag">${category}</span>
-          <h2>${title}</h2>
+          <span class="status">${category}</span>
+          <h3>${title}</h3>
           <pre>${escapeHtml(text)}</pre>
-          <div class="actions">
-            <button class="copy" type="button" data-index="${index}">複製</button>
-            <span class="hint">${text.length} 字</span>
-          </div>
+          <button class="copy" type="button" data-prompt-index="${index}">複製</button>
         </article>
       `).join("");
 
-      cards.querySelectorAll(".copy").forEach((button, index) => {
-        button.addEventListener("click", async () => {
-          await navigator.clipboard.writeText(filtered[index][2]);
-          button.textContent = "已複製";
-          setTimeout(() => button.textContent = "複製", 1200);
-        });
+      cards.querySelectorAll("[data-prompt-index]").forEach((button, index) => {
+        button.addEventListener("click", async () => copyText(filtered[index][2], button));
       });
 
       empty.style.display = filtered.length ? "none" : "block";
@@ -302,11 +569,25 @@
       }[char]));
     }
 
+    async function copyText(text, button) {
+      await navigator.clipboard.writeText(text);
+      const old = button.textContent;
+      button.textContent = "已複製";
+      setTimeout(() => button.textContent = old, 1200);
+    }
+
     tabs.forEach(tab => {
       tab.addEventListener("click", () => {
         active = tab.dataset.filter;
         tabs.forEach(item => item.setAttribute("aria-pressed", String(item === tab)));
         render();
+      });
+    });
+
+    document.querySelectorAll("[data-copy-target]").forEach(button => {
+      button.addEventListener("click", () => {
+        const target = document.getElementById(button.dataset.copyTarget);
+        copyText(target.textContent, button);
       });
     });
 
