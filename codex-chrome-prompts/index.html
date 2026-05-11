@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Codex Chrome 指令卡片</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f7f5ef;
+      --ink: #202124;
+      --muted: #62615c;
+      --line: #ded9cd;
+      --panel: #fffdf8;
+      --accent: #0f766e;
+      --accent-2: #9a3412;
+      --chip: #e8f4f1;
+      --shadow: 0 14px 36px rgba(53, 46, 35, 0.10);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.55;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(247, 245, 239, 0.94);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .wrap {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: 1fr minmax(220px, 360px);
+      gap: 16px;
+      align-items: center;
+      padding: 18px 0;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(24px, 4vw, 42px);
+      letter-spacing: 0;
+    }
+
+    .sub {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .search {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font: inherit;
+      background: #fff;
+      color: var(--ink);
+    }
+
+    main {
+      padding: 28px 0 56px;
+    }
+
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 22px;
+    }
+
+    .tab {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 9px 13px;
+      cursor: pointer;
+      font: inherit;
+      min-height: 40px;
+    }
+
+    .tab[aria-pressed="true"] {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 220px;
+    }
+
+    .card h2 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    .tag {
+      width: fit-content;
+      max-width: 100%;
+      border-radius: 999px;
+      background: var(--chip);
+      color: #0b5f59;
+      padding: 4px 9px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      background: #232323;
+      color: #fffaf0;
+      border-radius: 8px;
+      padding: 14px;
+      font-size: 14px;
+      flex: 1;
+      overflow: auto;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .copy {
+      border: 0;
+      background: var(--accent-2);
+      color: white;
+      border-radius: 8px;
+      min-height: 40px;
+      padding: 9px 13px;
+      cursor: pointer;
+      font: inherit;
+      font-weight: 700;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .empty {
+      display: none;
+      padding: 36px;
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      text-align: center;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    @media (max-width: 720px) {
+      .topbar {
+        grid-template-columns: 1fr;
+      }
+
+      .wrap {
+        width: min(100% - 22px, 1180px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap topbar">
+      <div>
+        <h1>Codex Chrome 指令卡片</h1>
+        <p class="sub">把常用指令放在同一頁，需要時搜尋、分類瀏覽、快速複製。</p>
+      </div>
+      <input id="search" class="search" type="search" placeholder="搜尋：試算表、填表、測試、比價..." aria-label="搜尋指令">
+    </div>
+  </header>
+
+  <main class="wrap">
+    <nav class="tabs" aria-label="指令分類">
+      <button class="tab" type="button" data-filter="all" aria-pressed="true">全部</button>
+      <button class="tab" type="button" data-filter="基本">基本</button>
+      <button class="tab" type="button" data-filter="試算表">試算表</button>
+      <button class="tab" type="button" data-filter="填表">填表</button>
+      <button class="tab" type="button" data-filter="後台">後台</button>
+      <button class="tab" type="button" data-filter="測試">網站測試</button>
+      <button class="tab" type="button" data-filter="研究">研究整理</button>
+      <button class="tab" type="button" data-filter="安全">確認再動作</button>
+    </nav>
+
+    <section id="cards" class="grid" aria-live="polite"></section>
+    <div id="empty" class="empty">找不到符合的指令，換個關鍵字試試。</div>
+  </main>
+
+  <script>
+    const prompts = [
+      ["基本", "查看目前分頁", "用 Chrome 幫我看目前開著的分頁，告訴我每個分頁大概是什麼內容。"],
+      ["基本", "接手目前頁面", "用 Chrome 接手我目前正在看的這個分頁，先不要操作，只幫我判斷現在頁面在哪一步。"],
+      ["基本", "打開網址", "用 Chrome 打開這個網址：＿＿＿，幫我看頁面上有哪些主要功能。"],
+      ["基本", "截圖檢查", "用 Chrome 幫我截圖目前頁面，並指出哪裡可能需要我注意。"],
+      ["試算表", "新增老師姓名", "用 Chrome 幫我操作目前開著的 Google 試算表，找到「老師姓名」欄，新增「王小明」。"],
+      ["試算表", "找空白姓名", "用 Chrome 幫我看目前這份試算表，找出有空白姓名的列，先列給我確認，不要修改。"],
+      ["試算表", "搜尋名字", "用 Chrome 幫我在目前試算表搜尋「李美花」，告訴我出現在哪些工作表和列。"],
+      ["試算表", "批次改名", "用 Chrome 幫我把目前試算表中「舊老師名字」改成「新老師名字」，改之前先告訴我找到幾筆。"],
+      ["試算表", "你的統計表模板", "用 Chrome 幫我操作目前開著的試算表「01-線上錄影費-統計表(中高級線上族語家教)」。\n\n任務：新增老師名字\n名字：＿＿＿\n位置：＿＿＿工作表，＿＿＿欄\n規則：不要覆蓋原本資料，新增前先告訴我你找到的位置。"],
+      ["填表", "填表但不送出", "用 Chrome 幫我填寫目前頁面的表單。資料如下：\n姓名：\n電話：\nEmail：\n地址：\n送出前先停下來讓我確認。"],
+      ["填表", "檢查必填欄位", "用 Chrome 幫我檢查這個報名表有哪些必填欄位，先不要填。"],
+      ["填表", "送出前截圖", "用 Chrome 幫我填完目前表單，最後送出前截圖給我確認。"],
+      ["後台", "今日訂單", "用 Chrome 幫我進目前後台，找出今天新增的訂單數量。"],
+      ["後台", "搜尋客戶", "用 Chrome 幫我在後台搜尋客戶「＿＿＿」，整理他的基本資料和最近紀錄。"],
+      ["後台", "待處理清單", "用 Chrome 幫我檢查後台裡狀態是「待處理」的項目，列成表格給我。"],
+      ["後台", "下載報表", "用 Chrome 幫我下載後台今天的報表，下載後告訴我檔名。"],
+      ["測試", "登入流程", "用 Chrome 幫我測試這個網站的登入流程：輸入帳號密碼後，確認是否成功進入首頁。"],
+      ["測試", "測試按鈕", "用 Chrome 幫我測試目前頁面的所有按鈕，告訴我哪些可以正常點、哪些沒有反應。"],
+      ["測試", "手機版跑版", "用 Chrome 幫我測試手機版畫面，看文字或按鈕有沒有重疊。"],
+      ["測試", "購物流程", "用 Chrome 幫我測試購物流程：加入購物車、進入結帳頁，但不要付款。"],
+      ["研究", "比較商品", "用 Chrome 幫我比較這三個商品頁面的價格、規格、運費和保固：\n1.\n2.\n3."],
+      ["研究", "整理重點", "用 Chrome 幫我讀目前頁面，整理成 5 個重點。"],
+      ["研究", "擷取表格", "用 Chrome 幫我把目前頁面的表格整理成 Markdown 表格。"],
+      ["研究", "擷取聯絡資訊", "用 Chrome 幫我從目前頁面找出所有 Email 和電話。"],
+      ["安全", "修改前確認", "用 Chrome 幫我找出可以修改的地方，但任何儲存、送出、刪除動作都要先問我。"],
+      ["安全", "等我說開始", "用 Chrome 幫我檢查這份資料，列出你準備修改的項目，等我說「開始」才修改。"],
+      ["安全", "高風險停下", "用 Chrome 幫我完成這個流程，但遇到付款、送出、刪除、公開發布時一定要停下來。"],
+      ["安全", "萬用模板", "用 Chrome 幫我操作目前頁面。\n我要達成：＿＿＿\n資料在：＿＿＿\n要新增/修改成：＿＿＿\n限制：送出、刪除、付款、公開前都要先問我。\n完成後請回報你改了哪裡。"]
+    ];
+
+    const cards = document.querySelector("#cards");
+    const empty = document.querySelector("#empty");
+    const search = document.querySelector("#search");
+    const tabs = [...document.querySelectorAll(".tab")];
+    let active = "all";
+
+    function render() {
+      const q = search.value.trim().toLowerCase();
+      const filtered = prompts.filter(([category, title, text]) => {
+        const inCategory = active === "all" || category === active;
+        const haystack = `${category} ${title} ${text}`.toLowerCase();
+        return inCategory && (!q || haystack.includes(q));
+      });
+
+      cards.innerHTML = filtered.map(([category, title, text], index) => `
+        <article class="card">
+          <span class="tag">${category}</span>
+          <h2>${title}</h2>
+          <pre>${escapeHtml(text)}</pre>
+          <div class="actions">
+            <button class="copy" type="button" data-index="${index}">複製</button>
+            <span class="hint">${text.length} 字</span>
+          </div>
+        </article>
+      `).join("");
+
+      cards.querySelectorAll(".copy").forEach((button, index) => {
+        button.addEventListener("click", async () => {
+          await navigator.clipboard.writeText(filtered[index][2]);
+          button.textContent = "已複製";
+          setTimeout(() => button.textContent = "複製", 1200);
+        });
+      });
+
+      empty.style.display = filtered.length ? "none" : "block";
+    }
+
+    function escapeHtml(value) {
+      return value.replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "\"": "&quot;",
+        "'": "&#039;"
+      }[char]));
+    }
+
+    tabs.forEach(tab => {
+      tab.addEventListener("click", () => {
+        active = tab.dataset.filter;
+        tabs.forEach(item => item.setAttribute("aria-pressed", String(item === tab)));
+        render();
+      });
+    });
+
+    search.addEventListener("input", render);
+    render();
+  </script>
+</body>
+</html>
