@@ -47,7 +47,7 @@
     <div class="max-w-7xl mx-auto py-8 px-4 no-print">
         <header class="text-center mb-8">
             <div class="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-bold text-amber-800">
-                版本更新時間：2026-05-12 15:56（台北時間）｜右下角已新增「追加新日期照片」按鈕
+                版本更新時間：2026-05-12 16:39（台北時間）｜老師截圖改為卡片預覽，鐘點費明細表可直接編輯
             </div>
             <div class="mb-4">
                 <a href="../../" class="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800">
@@ -239,13 +239,27 @@
             const monthText = document.getElementById('monthTitle').value;
 
             const teacherKeys = Object.keys(currentTeacherGroups).sort();
+            if (teacherKeys.length === 0) {
+                container.innerHTML = `
+                    <div class="no-print bg-white border border-dashed border-slate-300 rounded-xl p-10 text-center text-slate-500">
+                        尚未上傳圖片。請先拖放圖片或點擊上傳區。
+                    </div>
+                `;
+                return;
+            }
+
+            const grid = document.createElement('div');
+            grid.className = "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 no-print mb-10";
+
             teacherKeys.forEach((teacherKey, index) => {
                 const group = currentTeacherGroups[teacherKey];
                 const sortedDates = Object.keys(group.dates).sort();
-
+                const firstDate = sortedDates[0] || "-";
+                const lastDate = sortedDates[sortedDates.length - 1] || "-";
+                
                 const block = document.createElement('div');
-                block.className = "bg-white rounded-xl shadow-md border border-slate-200 mb-12 teacher-block overflow-hidden";
-
+                block.className = "bg-white rounded-xl shadow-md border border-slate-200 teacher-block overflow-hidden";
+                
                 let rows = "";
                 sortedDates.forEach((date, i) => {
                     const url = URL.createObjectURL(group.dates[date]);
@@ -265,26 +279,51 @@
                 });
 
                 block.innerHTML = `
-                    <div class="no-print bg-slate-800 text-white px-6 py-3 flex flex-wrap justify-between items-center gap-4">
-                        <div class="flex items-center gap-4">
-                            <div class="flex items-center gap-2">
-                                <span class="text-xs text-slate-400">老師姓名:</span>
+                    <div class="no-print p-5">
+                        <div class="flex items-start justify-between gap-3 mb-4">
+                            <div>
+                                <div class="text-xs font-bold text-blue-600 mb-1">${group.lang}</div>
+                                <h3 class="text-xl font-bold text-slate-800">${group.displayName}</h3>
+                                <p class="text-sm text-slate-500 mt-1">共 ${sortedDates.length} 堂｜${firstDate} - ${lastDate}</p>
+                            </div>
+                            <button onclick="printSingleTeacher(${index})" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm font-bold flex items-center gap-1 shadow-md shrink-0">
+                                <i data-lucide="printer" class="w-4 h-4"></i> PDF
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                            <label class="grid gap-1 text-xs font-bold text-slate-500">
+                                老師姓名
                                 <input type="text" value="${group.displayName}"
                                        oninput="currentTeacherGroups['${teacherKey}'].displayName = this.value; renderPaymentTable(); document.getElementById('disp-t-${index}').innerText='${group.lang}-'+this.value"
-                                       class="bg-slate-700 border-none rounded px-2 py-1 text-sm w-28">
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <span class="text-xs text-slate-400">助教:</span>
+                                       class="border border-slate-300 rounded-lg px-3 py-2 text-sm font-normal text-slate-800">
+                            </label>
+                            <label class="grid gap-1 text-xs font-bold text-slate-500">
+                                助教
                                 <input type="text" value="${group.ta}"
                                        oninput="currentTeacherGroups['${teacherKey}'].ta = this.value; renderPaymentTable(); document.getElementById('disp-ta-${index}').innerText=this.value"
-                                       class="bg-slate-700 border-none rounded px-2 py-1 text-sm w-28">
-                            </div>
+                                       class="border border-slate-300 rounded-lg px-3 py-2 text-sm font-normal text-slate-800">
+                            </label>
                         </div>
-                        <button onclick="printSingleTeacher(${index})" class="bg-blue-600 hover:bg-blue-700 px-4 py-1.5 rounded text-sm font-bold flex items-center gap-1 shadow-md">
-                            <i data-lucide="printer" class="w-4 h-4"></i> 匯出本報表 (PDF)
-                        </button>
+                        <details class="rounded-lg border border-slate-200 bg-slate-50">
+                            <summary class="cursor-pointer px-4 py-3 font-bold text-slate-700 flex items-center justify-between">
+                                <span>展開預覽截圖</span>
+                                <span class="text-sm text-slate-400">${sortedDates.length} 張</span>
+                            </summary>
+                            <div class="border-t border-slate-200 bg-white max-h-[70vh] overflow-auto">
+                                <table class="w-full text-sm">
+                                    <thead class="sticky top-0 bg-slate-100">
+                                        <tr>
+                                            <th class="p-2 border-b w-14">堂序</th>
+                                            <th class="p-2 border-b w-24">日期</th>
+                                            <th class="p-2 border-b">截圖</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>${rows}</tbody>
+                                </table>
+                            </div>
+                        </details>
                     </div>
-                    <div class="print-section p-10 bg-white">
+                    <div class="print-section hidden p-10 bg-white">
                         <h2 class="text-2xl font-bold text-center mb-8 text-black">115年臺北市中高級線上族語家教老師 - ${monthText}截圖</h2>
                         <div class="flex justify-between mb-4 border-b-2 border-black pb-1">
                             <div class="text-lg font-bold">授課老師：<span id="disp-t-${index}">${group.lang}-${group.displayName}</span></div>
@@ -302,8 +341,9 @@
                         </table>
                     </div>
                 `;
-                container.appendChild(block);
+                grid.appendChild(block);
             });
+            container.appendChild(grid);
             lucide.createIcons();
         }
 
@@ -314,23 +354,23 @@
             const unitPrice = parseInt(document.getElementById('unitPrice').value) || 1000;
 
             let html = `
-                <h2 class="text-xl font-bold text-center mb-6 text-black">115年度臺北市原住民族語中高級線上家教 ${monthText}師資鐘點費請領明細表</h2>
+                <h2 contenteditable="true" class="text-xl font-bold text-center mb-6 text-black outline-blue-300">115年度臺北市原住民族語中高級線上家教 ${monthText}師資鐘點費請領明細表</h2>
                 <table class="w-full text-[11px] border-collapse border border-black text-black">
                     <thead class="bg-gray-100">
                         <tr>
-                            <th class="border border-black p-1">序號</th>
-                            <th class="border border-black p-1 w-16">授課老師</th>
-                            <th class="border border-black p-1">身分證字號</th>
-                            <th class="border border-black p-1 w-32">地址</th>
-                            <th class="border border-black p-1">匯款銀行/帳號</th>
-                            <th class="border border-black p-1">電話</th>
-                            <th class="border border-black p-1">課程名稱</th>
-                            <th class="border border-black p-1">開設級別</th>
-                            <th class="border border-black p-1 w-32">上課日期</th>
-                            <th class="border border-black p-1">堂數</th>
-                            <th class="border border-black p-1 w-20">課程時間</th>
-                            <th class="border border-black p-1">單價</th>
-                            <th class="border border-black p-1">鐘點費</th>
+                            <th contenteditable="true" class="border border-black p-1">序號</th>
+                            <th contenteditable="true" class="border border-black p-1 w-16">授課老師</th>
+                            <th contenteditable="true" class="border border-black p-1">身分證字號</th>
+                            <th contenteditable="true" class="border border-black p-1 w-32">地址</th>
+                            <th contenteditable="true" class="border border-black p-1">匯款銀行/帳號</th>
+                            <th contenteditable="true" class="border border-black p-1">電話</th>
+                            <th contenteditable="true" class="border border-black p-1">課程名稱</th>
+                            <th contenteditable="true" class="border border-black p-1">開設級別</th>
+                            <th contenteditable="true" class="border border-black p-1 w-32">上課日期</th>
+                            <th contenteditable="true" class="border border-black p-1">堂數</th>
+                            <th contenteditable="true" class="border border-black p-1 w-20">課程時間</th>
+                            <th contenteditable="true" class="border border-black p-1">單價</th>
+                            <th contenteditable="true" class="border border-black p-1">鐘點費</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -353,19 +393,19 @@
 
                 html += `
                     <tr>
-                        <td class="border border-black p-1 text-center">${idx + 1}</td>
-                        <td class="border border-black p-1 text-center font-bold">${group.displayName}</td>
-                        <td class="border border-black p-1 text-center">${info.id}</td>
-                        <td class="border border-black p-1 text-[9px] leading-tight">${info.addr}</td>
-                        <td class="border border-black p-1 text-center text-[10px]">${info.bank}</td>
-                        <td class="border border-black p-1 text-center">${info.tel}</td>
-                        <td class="border border-black p-1 text-center">${group.lang}</td>
-                        <td class="border border-black p-1 text-center">中高級</td>
-                        <td class="border border-black p-1 text-center leading-tight">${dateStr}</td>
-                        <td class="border border-black p-1 text-center">${dates.length}</td>
-                        <td class="border border-black p-1 text-center">${info.time}</td>
-                        <td class="border border-black p-1 text-center">${unitPrice}</td>
-                        <td class="border border-black p-1 text-center font-bold">${totalPay}</td>
+                        <td contenteditable="true" class="border border-black p-1 text-center">${idx + 1}</td>
+                        <td contenteditable="true" class="border border-black p-1 text-center font-bold">${group.displayName}</td>
+                        <td contenteditable="true" class="border border-black p-1 text-center">${info.id}</td>
+                        <td contenteditable="true" class="border border-black p-1 text-[9px] leading-tight">${info.addr}</td>
+                        <td contenteditable="true" class="border border-black p-1 text-center text-[10px]">${info.bank}</td>
+                        <td contenteditable="true" class="border border-black p-1 text-center">${info.tel}</td>
+                        <td contenteditable="true" class="border border-black p-1 text-center">${group.lang}</td>
+                        <td contenteditable="true" class="border border-black p-1 text-center">中高級</td>
+                        <td contenteditable="true" class="border border-black p-1 text-center leading-tight">${dateStr}</td>
+                        <td contenteditable="true" class="border border-black p-1 text-center">${dates.length}</td>
+                        <td contenteditable="true" class="border border-black p-1 text-center">${info.time}</td>
+                        <td contenteditable="true" class="border border-black p-1 text-center">${unitPrice}</td>
+                        <td contenteditable="true" class="border border-black p-1 text-center font-bold">${totalPay}</td>
                     </tr>
                 `;
             });
@@ -373,7 +413,7 @@
             html += `
                     </tbody>
                 </table>
-                <div class="mt-4 text-right font-bold text-lg text-black">總計申領金額：NT$ ${overallTotal}</div>
+                <div contenteditable="true" class="mt-4 text-right font-bold text-lg text-black outline-blue-300">總計申領金額：NT$ ${overallTotal}</div>
             `;
             container.innerHTML = html;
         }
