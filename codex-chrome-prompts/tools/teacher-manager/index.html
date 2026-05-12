@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>115年臺北市中高級線上族語家教老師 - 管理系統</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @media print {
+            .no-print, .no-print * { display: none !important; }
+            .print-section {
+                display: block !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            .page-break { page-break-after: always; }
+            table { border-collapse: collapse !important; width: 100% !important; }
+            th, td { border: 1px solid black !important; padding: 4px !important; }
+            img { max-width: 500px !important; height: auto !important; }
+        }
+
+        .file-drop-zone { border: 2px dashed #cbd5e1; transition: all 0.3s ease; }
+        .file-drop-zone.dragover { border-color: #3b82f6; background-color: #eff6ff; }
+        .tab-active { border-bottom: 3px solid #3b82f6; color: #3b82f6; font-weight: bold; }
+        .modal-overlay { background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(2px); }
+        .thumbnail-container:hover .delete-btn { opacity: 1; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen font-sans">
+
+    <div id="deleteModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 modal-overlay no-print">
+        <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6">
+            <div class="flex items-center gap-3 text-red-600 mb-4">
+                <i data-lucide="alert-triangle" class="w-8 h-8"></i>
+                <h3 class="text-xl font-bold">確認刪除？</h3>
+            </div>
+            <p id="deleteModalText" class="text-slate-600 mb-6">您確定要刪除這筆課程記錄嗎？</p>
+            <div class="flex justify-end gap-3">
+                <button onclick="closeDeleteModal()" class="px-4 py-2 text-slate-500 hover:bg-slate-100 rounded-lg">取消</button>
+                <button id="confirmDeleteBtn" class="px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded-lg shadow-md">確定刪除</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto py-8 px-4 no-print">
+        <header class="text-center mb-8">
+            <div class="mb-4">
+                <a href="../../" class="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i> 回練習基地
+                </a>
+            </div>
+            <h1 class="text-3xl font-bold text-slate-800 mb-2">115年臺北市中高級線上族語家教老師管理系統</h1>
+            <div class="flex justify-center gap-6 mt-4">
+                <button onclick="switchTab('screenshot')" id="tab-screenshot" class="px-4 py-2 tab-active transition-all">截圖報表管理</button>
+                <button onclick="switchTab('payment')" id="tab-payment" class="px-4 py-2 text-slate-500 transition-all">鐘點費明細表</button>
+            </div>
+        </header>
+
+        <div id="uploadSection" class="bg-white rounded-xl shadow-sm p-6 mb-8 border border-slate-200">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">報表月份 (如：3月份、4-5月份)</label>
+                    <input type="text" id="monthTitle" value="3月份" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">鐘點費單價 (每小時)</label>
+                    <input type="number" id="unitPrice" value="1000" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+            </div>
+
+            <div id="dropZone" class="file-drop-zone bg-slate-50 rounded-xl p-10 text-center cursor-pointer hover:bg-slate-100 transition-colors">
+                <i data-lucide="upload-cloud" class="mx-auto mb-4 text-slate-400 w-12 h-12"></i>
+                <p class="text-slate-600 mb-2 font-medium">拖放圖片至此或點擊上傳</p>
+                <p class="text-xs text-slate-400">支援格式：語別-老師-日期-編號 (如: 南排灣語-楊寶珠-0425-1)</p>
+                <input type="file" id="imageInput" multiple accept="image/*" class="hidden">
+            </div>
+
+            <div class="flex justify-center mt-6">
+                <button onclick="processImages()" class="bg-blue-600 hover:bg-blue-700 text-white px-10 py-3 rounded-lg font-bold transition flex items-center gap-2 shadow-lg">
+                    <i data-lucide="play" class="w-5 h-5"></i> 分類圖片並生成報表
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <main class="max-w-7xl mx-auto px-4 pb-20">
+        <div id="screenshotView"></div>
+        <div id="paymentView" class="hidden">
+            <div class="bg-white p-8 rounded-xl shadow-md border border-slate-200 overflow-x-auto">
+                <div class="flex justify-between items-center mb-6 no-print">
+                    <h3 class="text-lg font-bold">鐘點費請領預覽</h3>
+                    <button onclick="window.print()" class="bg-slate-800 text-white px-4 py-2 rounded hover:bg-black flex items-center gap-2">
+                        <i data-lucide="printer" class="w-4 h-4"></i> 列印明細總表
+                    </button>
+                </div>
+                <div id="paymentTableContainer" class="print-section"></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        lucide.createIcons();
+
+        const teacherDB = {
+            "張月瑛": { id: "U220341002", addr: "新北市板橋區漢生東路340巷11-3號4樓", bank: "0311083-0600481", tel: "0933-341099", time: "18:30-20:30", lang: "秀姑巒阿美語" },
+            "石佳蓉": { id: "TXXXXXXXXX", addr: "資料待補", bank: "資料待補", tel: "09XX-XXXXXX", time: "19:00-21:00", lang: "海岸阿美語" },
+            "劉立雲": { id: "GXXXXXXXXX", addr: "資料待補", bank: "資料待補", tel: "09XX-XXXXXX", time: "19:00-21:00", lang: "賽考利克泰雅語" },
+            "林成遠": { id: "XXXXXXXXXX", addr: "資料待補", bank: "資料待補", tel: "09XX-XXXXXX", time: "19:00-21:00", lang: "汶水泰雅語" },
+            "林秋英": { id: "XXXXXXXXXX", addr: "資料待補", bank: "資料待補", tel: "09XX-XXXXXX", time: "19:00-21:00", lang: "巒群布農語" },
+            "打亥": { id: "XXXXXXXXXX", addr: "資料待補", bank: "資料待補", tel: "09XX-XXXXXX", time: "19:00-21:00", lang: "郡群布農語" },
+            "鄭春美": { id: "XXXXXXXXXX", addr: "資料待補", bank: "資料待補", tel: "09XX-XXXXXX", time: "19:00-21:00", lang: "東排灣語" },
+            "楊寶珠": { id: "XXXXXXXXXX", addr: "資料待補", bank: "資料待補", tel: "09XX-XXXXXX", time: "14:00-16:00", lang: "南排灣語" },
+            "柯菊華": { id: "XXXXXXXXXX", addr: "資料待補", bank: "資料待補", tel: "09XX-XXXXXX", time: "18:30-20:30", lang: "霧臺魯凱語" },
+            "彭甄琳": { id: "XXXXXXXXXX", addr: "資料待補", bank: "資料待補", tel: "09XX-XXXXXX", time: "18:00-20:30", lang: "太魯閣語" },
+            "胡美芳": { id: "U220471989", addr: "花蓮縣吉安鄉吉安路五段202號", bank: "0091111-0019180", tel: "0933-483789", time: "19:00-21:00", lang: "南勢阿美語" },
+            "古文進": { id: "G101833215", addr: "新北市汐止區湖光里30鄰明峰街28號3樓", bank: "0002612-0468951", tel: "0930-710188", time: "19:00-21:00", lang: "賽考利克泰雅語" }
+        };
+
+        const assistantMap = {
+            "張月瑛": "蔡儀婷", "石佳蓉": "邱意庭", "劉立雲": "尤敏", "林成遠": "陳冠萍",
+            "林秋英": "邱佳萍", "打亥": "陳冠萍", "鄭春美": "尤敏", "楊寶珠": "邱佳萍",
+            "柯菊華": "邱佳萍", "彭甄琳": "林潔", "胡美芳": "尤敏"
+        };
+
+        let currentTeacherGroups = {};
+        let pendingDeleteData = null;
+
+        function switchTab(tab) {
+            document.getElementById('screenshotView').classList.toggle('hidden', tab !== 'screenshot');
+            document.getElementById('paymentView').classList.toggle('hidden', tab !== 'payment');
+            document.getElementById('tab-screenshot').className = tab === 'screenshot' ? 'px-4 py-2 tab-active' : 'px-4 py-2 text-slate-500';
+            document.getElementById('tab-payment').className = tab === 'payment' ? 'px-4 py-2 tab-active' : 'px-4 py-2 text-slate-500';
+            if (tab === 'payment') renderPaymentTable();
+        }
+
+        const dropZone = document.getElementById('dropZone');
+        const imageInput = document.getElementById('imageInput');
+        dropZone.addEventListener('click', () => imageInput.click());
+        imageInput.addEventListener('change', processImages);
+        dropZone.addEventListener('dragover', event => {
+            event.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+        dropZone.addEventListener('drop', event => {
+            event.preventDefault();
+            dropZone.classList.remove('dragover');
+            imageInput.files = event.dataTransfer.files;
+            processImages();
+        });
+
+        function processImages() {
+            const files = imageInput.files;
+            if (files.length === 0) return;
+
+            currentTeacherGroups = {};
+            Array.from(files).forEach(file => {
+                const cleanName = file.name.replace(/\.[^/.]+$/, "");
+                const parts = cleanName.split('-');
+                if (parts.length >= 3) {
+                    const lang = parts[0].trim();
+                    const teacherKey = parts[1].trim().replace('老師', '');
+                    const date = parts[2].trim();
+
+                    if (!currentTeacherGroups[teacherKey]) {
+                        currentTeacherGroups[teacherKey] = {
+                            lang,
+                            displayName: teacherKey,
+                            ta: assistantMap[teacherKey] || "",
+                            dates: {}
+                        };
+                    }
+                    if (!currentTeacherGroups[teacherKey].dates[date]) {
+                        currentTeacherGroups[teacherKey].dates[date] = file;
+                    }
+                }
+            });
+            renderAll();
+        }
+
+        function openDeleteModal(teacher, date) {
+            pendingDeleteData = { teacher, date };
+            document.getElementById('deleteModal').classList.remove('hidden');
+            document.getElementById('deleteModal').classList.add('flex');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.add('hidden');
+            document.getElementById('deleteModal').classList.remove('flex');
+            pendingDeleteData = null;
+        }
+
+        document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
+            if (pendingDeleteData) {
+                const { teacher, date } = pendingDeleteData;
+                delete currentTeacherGroups[teacher].dates[date];
+                if (Object.keys(currentTeacherGroups[teacher].dates).length === 0) {
+                    delete currentTeacherGroups[teacher];
+                }
+                renderAll();
+            }
+            closeDeleteModal();
+        });
+
+        function printSingleTeacher(index) {
+            const allBlocks = document.querySelectorAll('.teacher-block');
+            allBlocks.forEach((block, idx) => {
+                if (idx === index) {
+                    block.classList.remove('no-print');
+                } else {
+                    block.classList.add('no-print');
+                }
+            });
+
+            setTimeout(() => {
+                window.print();
+                allBlocks.forEach(block => block.classList.remove('no-print'));
+            }, 50);
+        }
+
+        function renderAll() {
+            renderScreenshots();
+            renderPaymentTable();
+        }
+
+        function renderScreenshots() {
+            const container = document.getElementById('screenshotView');
+            container.innerHTML = "";
+            const monthText = document.getElementById('monthTitle').value;
+
+            const teacherKeys = Object.keys(currentTeacherGroups).sort();
+            teacherKeys.forEach((teacherKey, index) => {
+                const group = currentTeacherGroups[teacherKey];
+                const sortedDates = Object.keys(group.dates).sort();
+
+                const block = document.createElement('div');
+                block.className = "bg-white rounded-xl shadow-md border border-slate-200 mb-12 teacher-block overflow-hidden";
+
+                let rows = "";
+                sortedDates.forEach((date, i) => {
+                    const url = URL.createObjectURL(group.dates[date]);
+                    rows += `
+                        <tr class="border-b border-slate-200">
+                            <td class="p-4 text-center border-r w-16">${i + 1}</td>
+                            <td class="p-4 text-center border-r font-bold w-32">${date}</td>
+                            <td class="p-4 relative group thumbnail-container">
+                                <img src="${url}" class="w-[500px] mx-auto rounded border border-slate-100">
+                                <button onclick="openDeleteModal('${teacherKey.replace(/'/g, "\\'")}', '${date}')"
+                                        class="no-print delete-btn absolute top-6 right-6 bg-red-500 hover:bg-red-700 text-white p-2 rounded-full opacity-0 transition shadow-lg">
+                                    <i data-lucide="trash-2" class="w-5 h-5"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                block.innerHTML = `
+                    <div class="no-print bg-slate-800 text-white px-6 py-3 flex flex-wrap justify-between items-center gap-4">
+                        <div class="flex items-center gap-4">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs text-slate-400">老師姓名:</span>
+                                <input type="text" value="${group.displayName}"
+                                       oninput="currentTeacherGroups['${teacherKey}'].displayName = this.value; renderPaymentTable(); document.getElementById('disp-t-${index}').innerText='${group.lang}-'+this.value"
+                                       class="bg-slate-700 border-none rounded px-2 py-1 text-sm w-28">
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs text-slate-400">助教:</span>
+                                <input type="text" value="${group.ta}"
+                                       oninput="currentTeacherGroups['${teacherKey}'].ta = this.value; renderPaymentTable(); document.getElementById('disp-ta-${index}').innerText=this.value"
+                                       class="bg-slate-700 border-none rounded px-2 py-1 text-sm w-28">
+                            </div>
+                        </div>
+                        <button onclick="printSingleTeacher(${index})" class="bg-blue-600 hover:bg-blue-700 px-4 py-1.5 rounded text-sm font-bold flex items-center gap-1 shadow-md">
+                            <i data-lucide="printer" class="w-4 h-4"></i> 匯出本報表 (PDF)
+                        </button>
+                    </div>
+                    <div class="print-section p-10 bg-white">
+                        <h2 class="text-2xl font-bold text-center mb-8 text-black">115年臺北市中高級線上族語家教老師 - ${monthText}截圖</h2>
+                        <div class="flex justify-between mb-4 border-b-2 border-black pb-1">
+                            <div class="text-lg font-bold">授課老師：<span id="disp-t-${index}">${group.lang}-${group.displayName}</span></div>
+                            <div class="text-lg font-bold">助教：<span id="disp-ta-${index}">${group.ta}</span></div>
+                        </div>
+                        <table class="w-full border-2 border-black text-black">
+                            <thead class="bg-slate-50">
+                                <tr>
+                                    <th class="border-2 border-black p-2 w-16">堂序</th>
+                                    <th class="border-2 border-black p-2 w-32">上課日期</th>
+                                    <th class="border-2 border-black p-2">授課截圖</th>
+                                </tr>
+                            </thead>
+                            <tbody>${rows}</tbody>
+                        </table>
+                    </div>
+                `;
+                container.appendChild(block);
+            });
+            lucide.createIcons();
+        }
+
+        function renderPaymentTable() {
+            const container = document.getElementById('paymentTableContainer');
+            if (!container) return;
+            const monthText = document.getElementById('monthTitle').value;
+            const unitPrice = parseInt(document.getElementById('unitPrice').value) || 1000;
+
+            let html = `
+                <h2 class="text-xl font-bold text-center mb-6 text-black">115年度臺北市原住民族語中高級線上家教 ${monthText}師資鐘點費請領明細表</h2>
+                <table class="w-full text-[11px] border-collapse border border-black text-black">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="border border-black p-1">序號</th>
+                            <th class="border border-black p-1 w-16">授課老師</th>
+                            <th class="border border-black p-1">身分證字號</th>
+                            <th class="border border-black p-1 w-32">地址</th>
+                            <th class="border border-black p-1">匯款銀行/帳號</th>
+                            <th class="border border-black p-1">電話</th>
+                            <th class="border border-black p-1">課程名稱</th>
+                            <th class="border border-black p-1">開設級別</th>
+                            <th class="border border-black p-1 w-32">上課日期</th>
+                            <th class="border border-black p-1">堂數</th>
+                            <th class="border border-black p-1 w-20">課程時間</th>
+                            <th class="border border-black p-1">單價</th>
+                            <th class="border border-black p-1">鐘點費</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            let overallTotal = 0;
+            Object.keys(currentTeacherGroups).sort().forEach((key, idx) => {
+                const group = currentTeacherGroups[key];
+                const info = teacherDB[key] || { id: "-", addr: "-", bank: "-", tel: "-", time: "19:00-21:00", lang: group.lang };
+                const dates = Object.keys(group.dates).sort();
+                const totalPay = dates.length * 2 * unitPrice;
+                overallTotal += totalPay;
+
+                const dateStr = dates.map(d => {
+                    if (d.length === 4 && /^\d+$/.test(d)) {
+                        return `${parseInt(d.substring(0,2))}/${parseInt(d.substring(2,4))}(2H)`;
+                    }
+                    return `${d}(2H)`;
+                }).join('<br>');
+
+                html += `
+                    <tr>
+                        <td class="border border-black p-1 text-center">${idx + 1}</td>
+                        <td class="border border-black p-1 text-center font-bold">${group.displayName}</td>
+                        <td class="border border-black p-1 text-center">${info.id}</td>
+                        <td class="border border-black p-1 text-[9px] leading-tight">${info.addr}</td>
+                        <td class="border border-black p-1 text-center text-[10px]">${info.bank}</td>
+                        <td class="border border-black p-1 text-center">${info.tel}</td>
+                        <td class="border border-black p-1 text-center">${group.lang}</td>
+                        <td class="border border-black p-1 text-center">中高級</td>
+                        <td class="border border-black p-1 text-center leading-tight">${dateStr}</td>
+                        <td class="border border-black p-1 text-center">${dates.length}</td>
+                        <td class="border border-black p-1 text-center">${info.time}</td>
+                        <td class="border border-black p-1 text-center">${unitPrice}</td>
+                        <td class="border border-black p-1 text-center font-bold">${totalPay}</td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                </table>
+                <div class="mt-4 text-right font-bold text-lg text-black">總計申領金額：NT$ ${overallTotal}</div>
+            `;
+            container.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
