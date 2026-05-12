@@ -162,8 +162,6 @@
                     const lang = parts[0].trim();
                     const teacherKey = parts[1].trim().replace('老師', '');
                     const date = parts[2].trim();
-                    const sequence = parts[3] ? parts[3].trim() : "";
-                    let photoKey = sequence ? `${date}-${sequence}` : date;
 
                     if (!currentTeacherGroups[teacherKey]) {
                         currentTeacherGroups[teacherKey] = {
@@ -173,10 +171,9 @@
                             dates: {}
                         };
                     }
-                    while (currentTeacherGroups[teacherKey].dates[photoKey]) {
-                        photoKey = `${date}-${Date.now()}`;
+                    if (!currentTeacherGroups[teacherKey].dates[date]) {
+                        currentTeacherGroups[teacherKey].dates[date] = file;
                     }
-                    currentTeacherGroups[teacherKey].dates[photoKey] = file;
                 }
             });
             imageInput.value = "";
@@ -244,11 +241,10 @@
                 let rows = "";
                 sortedDates.forEach((date, i) => {
                     const url = URL.createObjectURL(group.dates[date]);
-                    const displayDate = date.split('-')[0];
                     rows += `
                         <tr class="border-b border-slate-200">
                             <td class="p-4 text-center border-r w-16">${i + 1}</td>
-                            <td class="p-4 text-center border-r font-bold w-32">${displayDate}</td>
+                            <td class="p-4 text-center border-r font-bold w-32">${date}</td>
                             <td class="p-4 relative group thumbnail-container">
                                 <img src="${url}" class="w-[500px] mx-auto rounded border border-slate-100">
                                 <button onclick="openDeleteModal('${teacherKey.replace(/'/g, "\\'")}', '${date}')"
@@ -341,11 +337,10 @@
                 overallTotal += totalPay;
 
                 const dateStr = dates.map(d => {
-                    const displayDate = d.split('-')[0];
-                    if (displayDate.length === 4 && /^\d+$/.test(displayDate)) {
-                        return `${parseInt(displayDate.substring(0,2))}/${parseInt(displayDate.substring(2,4))}(2H)`;
+                    if (d.length === 4 && /^\d+$/.test(d)) {
+                        return `${parseInt(d.substring(0,2))}/${parseInt(d.substring(2,4))}(2H)`;
                     }
-                    return `${displayDate}(2H)`;
+                    return `${d}(2H)`;
                 }).join('<br>');
 
                 html += `
