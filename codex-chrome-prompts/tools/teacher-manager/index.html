@@ -47,7 +47,7 @@
     <div class="max-w-7xl mx-auto py-8 px-4 no-print">
         <header class="text-center mb-8">
             <div class="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-bold text-amber-800">
-                版本更新時間：2026-05-12 15:49（台北時間）｜追加新圖片時，同一位老師同一日期只保留第一張
+                版本更新時間：2026-05-12 15:56（台北時間）｜右下角已新增「追加新日期照片」按鈕
             </div>
             <div class="mb-4">
                 <a href="../../" class="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800">
@@ -102,6 +102,11 @@
             </div>
         </div>
     </main>
+
+    <button onclick="imageInput.click()" class="fixed right-6 bottom-6 z-50 no-print bg-blue-600 hover:bg-blue-700 text-white px-5 py-4 rounded-full font-bold shadow-2xl flex items-center gap-2">
+        <i data-lucide="image-plus" class="w-5 h-5"></i>
+        追加新日期照片
+    </button>
 
     <script>
         lucide.createIcons();
