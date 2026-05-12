@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AI 網頁練習基地</title>
+  <title>族語教學 AI 工具練習基地</title>
   <style>
     :root {
       color-scheme: light;
@@ -340,23 +340,23 @@
   <header>
     <div class="wrap hero">
       <div>
-        <h1>AI 網頁練習基地</h1>
-        <p class="lead">每天用不同 AI 協作做一個小改版，把工具、指令和成果都累積在這一頁。這裡是你的首頁、練習筆記和作品索引。</p>
+        <h1>族語教學 AI 工具練習基地</h1>
+        <p class="lead">每天用 AI 做一個族語教學小工具、族語遊戲或課務管理功能，把教材、互動玩法和練習成果都累積在這一頁。</p>
       </div>
       <aside class="today">
         <h2>今日任務</h2>
-        <p>把族語家教截圖與鐘點費流程做成可用小工具，並把成果同步記錄到練習基地。</p>
+        <p>把一個族語教學需求做成可用工具：可以是詞卡、配對遊戲、聽力題、課程報表或老師管理流程。</p>
       </aside>
     </div>
   </header>
 
   <nav class="nav" aria-label="首頁導覽">
     <div class="wrap nav-inner">
-      <a href="#dashboard">練習儀表板</a>
-      <a href="#tools">小工具區</a>
-      <a href="#prompts">Codex Chrome 指令庫</a>
-      <a href="#projects">練習成果</a>
-      <a href="#routine">每日流程</a>
+      <a href="#dashboard">族語工具儀表板</a>
+      <a href="#tools">教學工具區</a>
+      <a href="#prompts">族語工具指令庫</a>
+      <a href="#projects">作品成果</a>
+      <a href="#routine">每日練習流程</a>
     </div>
   </nav>
 
@@ -364,13 +364,13 @@
     <section id="dashboard">
       <div class="section-title">
         <div>
-          <h2>練習儀表板</h2>
-          <p>用很小的單位累積，不靠靈感，靠節奏。</p>
+          <h2>族語工具儀表板</h2>
+          <p>把族語教學拆成小工具慢慢累積：先解決真實課務，再做互動遊戲。</p>
         </div>
       </div>
       <div class="metric" aria-label="練習統計">
-        <div><strong>2</strong><span>已完成工具</span></div>
-        <div><strong>28</strong><span>可複製指令</span></div>
+        <div><strong>2</strong><span>已完成族語工具</span></div>
+        <div><strong>12</strong><span>族語 AI 指令</span></div>
         <div><strong>20-40</strong><span>每日分鐘</span></div>
         <div><strong>7</strong><span>第一週任務</span></div>
       </div>
@@ -379,16 +379,16 @@
     <section id="tools">
       <div class="section-title">
         <div>
-          <h2>小工具區</h2>
-          <p>每個工具都可以是一個練習題：先做能用，再做漂亮，再做可維護。</p>
+          <h2>教學工具區</h2>
+          <p>每個工具都要貼近族語教學現場：老師好用、學生好玩、資料好整理。</p>
         </div>
       </div>
       <div class="grid">
         <article class="card tool-card">
           <span class="status done">已完成</span>
-          <h3>Codex Chrome 指令庫</h3>
-          <p>分類、搜尋、複製常用 Chrome 操作指令。今天的首頁從這個工具開始長出來。</p>
-          <a class="pill" href="#prompts">前往指令庫</a>
+          <h3>族語工具指令庫</h3>
+          <p>把常用 AI 指令整理成卡片，快速生成教材、遊戲規則、測驗題與課務流程。</p>
+          <a class="pill" href="#prompts">前往族語指令庫</a>
         </article>
         <article class="card tool-card">
           <span class="status done">已完成</span>
@@ -398,14 +398,14 @@
         </article>
         <article class="card tool-card">
           <span class="status next">下一步</span>
-          <h3>Prompt 產生器</h3>
-          <p>輸入任務、資料位置、限制條件，自動組出適合交給 Codex 或 Gemini 的指令。</p>
+          <h3>族語詞卡產生器</h3>
+          <p>輸入族語、中文、例句與主題，自動生成可列印或可遊戲化的課堂詞卡。</p>
           <button class="pill" type="button" disabled>待製作</button>
         </article>
         <article class="card tool-card">
           <span class="status next">下一步</span>
-          <h3>作品卡片產生器</h3>
-          <p>每次練習後填入名稱、學到的事、連結，直接生成一張成果卡片。</p>
+          <h3>族語配對遊戲</h3>
+          <p>把詞彙、圖片、音檔或中文意思做成翻牌配對，適合課堂暖身和複習。</p>
           <button class="pill" type="button" disabled>待製作</button>
         </article>
       </div>
@@ -414,23 +414,22 @@
     <section id="prompts">
       <div class="section-title">
         <div>
-          <h2>Codex Chrome 指令庫</h2>
-          <p>需要操作瀏覽器、測試網頁或整理資料時，從這裡挑一張卡片複製。</p>
+          <h2>族語工具指令庫</h2>
+          <p>要做教材、遊戲、報表或測驗時，從這裡挑一張指令複製給 AI。</p>
         </div>
       </div>
       <div class="prompt-panel">
         <div class="prompt-top">
           <div class="tabs" aria-label="指令分類">
             <button class="tab" type="button" data-filter="all" aria-pressed="true">全部</button>
-            <button class="tab" type="button" data-filter="基本">基本</button>
-            <button class="tab" type="button" data-filter="試算表">試算表</button>
-            <button class="tab" type="button" data-filter="填表">填表</button>
-            <button class="tab" type="button" data-filter="後台">後台</button>
-            <button class="tab" type="button" data-filter="測試">網站測試</button>
-            <button class="tab" type="button" data-filter="研究">研究整理</button>
+            <button class="tab" type="button" data-filter="教材">教材</button>
+            <button class="tab" type="button" data-filter="遊戲">遊戲</button>
+            <button class="tab" type="button" data-filter="管理">管理</button>
+            <button class="tab" type="button" data-filter="報表">報表</button>
+            <button class="tab" type="button" data-filter="測試">測試</button>
             <button class="tab" type="button" data-filter="安全">確認再動作</button>
           </div>
-          <input id="search" class="search" type="search" placeholder="搜尋：試算表、填表、測試、比價..." aria-label="搜尋指令">
+          <input id="search" class="search" type="search" placeholder="搜尋：詞卡、配對、聽力、報表、族語..." aria-label="搜尋指令">
         </div>
         <section id="cards" class="grid" aria-live="polite"></section>
         <div id="empty" class="empty">找不到符合的指令，換個關鍵字試試。</div>
@@ -440,26 +439,26 @@
     <section id="projects">
       <div class="section-title">
         <div>
-          <h2>練習成果</h2>
-          <p>每完成一次小任務，就把成果補到這裡。它會慢慢變成你的作品集。</p>
+          <h2>作品成果</h2>
+          <p>每完成一個族語教學工具，就把用途、族語情境和學到的 AI 協作方式記錄下來。</p>
         </div>
       </div>
       <div class="grid">
         <article class="card">
           <span class="status done">Day 1</span>
-          <h3>AI 網頁練習首頁</h3>
-          <p>把原本的指令卡片頁升級成首頁，包含小工具入口、成果區、每日流程和指令庫。</p>
+          <h3>族語工具練習首頁</h3>
+          <p>把練習基地改成族語教學工具索引，集中管理教材、遊戲、報表與 AI 指令。</p>
           <pre>使用 AI：
 Codex：改版與部署
 Chrome：GitHub 網頁提交
 
 學到：
-小工具首頁要先有導航、狀態和成果紀錄。</pre>
+族語工具首頁要先有清楚分類：教材、遊戲、課務管理、成果紀錄。</pre>
         </article>
         <article class="card">
           <span class="status next">待新增</span>
-          <h3>Prompt 產生器</h3>
-          <p>下一個練習可以把常用限制條件、資料位置、輸出格式做成表單，產出可直接貼給 AI 的指令。</p>
+          <h3>族語詞卡產生器</h3>
+          <p>下一個練習可以把族語詞彙、中文意思、例句、主題做成可列印詞卡。</p>
         </article>
         <article class="card">
           <span class="status done">Day 2</span>
@@ -478,32 +477,33 @@ Chrome：GitHub Pages 發布檢查
     <section id="routine">
       <div class="section-title">
         <div>
-          <h2>每日流程</h2>
-          <p>每次練習都照這個順序走，讓多個 AI 分工更穩。</p>
+          <h2>每日練習流程</h2>
+          <p>每天只做一個族語教學小功能，讓工具真的能進課堂或課務流程。</p>
         </div>
       </div>
       <div class="wide-grid">
         <article class="card">
-          <h3>20-40 分鐘流程</h3>
+          <h3>20-40 分鐘族語工具流程</h3>
           <ul class="checklist">
-            <li><span class="box"></span><span>選一個很小的功能，例如新增一張成果卡、改善搜尋、做一個表單。</span></li>
-            <li><span class="box"></span><span>先請一個 AI 幫你拆需求，再請另一個 AI 產出 UI 或文字。</span></li>
-            <li><span class="box"></span><span>交給 Codex 實作、測試、推到 GitHub Pages。</span></li>
-            <li><span class="box"></span><span>把今天學到的 prompt 寫進成果區。</span></li>
+            <li><span class="box"></span><span>選一個族語教學場景：詞彙複習、聽力練習、配對遊戲、老師報表。</span></li>
+            <li><span class="box"></span><span>請 AI 先拆出老師需求、學生操作方式和資料欄位。</span></li>
+            <li><span class="box"></span><span>交給 Codex 做成網頁工具，並用 Chrome 測試實際操作。</span></li>
+            <li><span class="box"></span><span>把今天完成的族語工具和學到的指令補進成果區。</span></li>
           </ul>
         </article>
         <article class="card">
-          <h3>萬用練習指令</h3>
-          <pre id="dailyPrompt">我正在練習用多個 AI 協作製作前端網頁。
+          <h3>族語工具萬用指令</h3>
+          <pre id="dailyPrompt">我正在練習用多個 AI 協作製作族語教學網頁工具。
 請幫我把今天的任務拆成：
-1. 需求澄清
-2. UI/內容設計
-3. Codex 實作指令
-4. 測試清單
-5. 要記錄到首頁的成果文字
+1. 族語教學情境
+2. 老師需要的操作流程
+3. 學生會看到的互動方式
+4. Codex 實作指令
+5. 測試清單
+6. 要記錄到首頁的成果文字
 
 今天任務：＿＿＿
-限制：20-40 分鐘內完成，先求能用，再求好看。</pre>
+限制：20-40 分鐘內完成，先求能在族語課堂使用，再慢慢美化。</pre>
           <button class="copy" type="button" data-copy-target="dailyPrompt">複製每日指令</button>
         </article>
       </div>
@@ -511,39 +511,23 @@ Chrome：GitHub Pages 發布檢查
   </main>
 
   <footer>
-    <div class="wrap">AI 網頁練習基地 · 每天一個小工具，每次留下一張成果卡。</div>
+    <div class="wrap">族語教學 AI 工具練習基地 · 每天一個族語小工具，每次留下可用成果。</div>
   </footer>
 
   <script>
     const prompts = [
-      ["基本", "查看目前分頁", "用 Chrome 幫我看目前開著的分頁，告訴我每個分頁大概是什麼內容。"],
-      ["基本", "接手目前頁面", "用 Chrome 接手我目前正在看的這個分頁，先不要操作，只幫我判斷現在頁面在哪一步。"],
-      ["基本", "打開網址", "用 Chrome 打開這個網址：＿＿＿，幫我看頁面上有哪些主要功能。"],
-      ["基本", "截圖檢查", "用 Chrome 幫我截圖目前頁面，並指出哪裡可能需要我注意。"],
-      ["試算表", "新增老師姓名", "用 Chrome 幫我操作目前開著的 Google 試算表，找到「老師姓名」欄，新增「王小明」。"],
-      ["試算表", "找空白姓名", "用 Chrome 幫我看目前這份試算表，找出有空白姓名的列，先列給我確認，不要修改。"],
-      ["試算表", "搜尋名字", "用 Chrome 幫我在目前試算表搜尋「李美花」，告訴我出現在哪些工作表和列。"],
-      ["試算表", "批次改名", "用 Chrome 幫我把目前試算表中「舊老師名字」改成「新老師名字」，改之前先告訴我找到幾筆。"],
-      ["試算表", "你的統計表模板", "用 Chrome 幫我操作目前開著的試算表「01-線上錄影費-統計表(中高級線上族語家教)」。\n\n任務：新增老師名字\n名字：＿＿＿\n位置：＿＿＿工作表，＿＿＿欄\n規則：不要覆蓋原本資料，新增前先告訴我你找到的位置。"],
-      ["填表", "填表但不送出", "用 Chrome 幫我填寫目前頁面的表單。資料如下：\n姓名：\n電話：\nEmail：\n地址：\n送出前先停下來讓我確認。"],
-      ["填表", "檢查必填欄位", "用 Chrome 幫我檢查這個報名表有哪些必填欄位，先不要填。"],
-      ["填表", "送出前截圖", "用 Chrome 幫我填完目前表單，最後送出前截圖給我確認。"],
-      ["後台", "今日訂單", "用 Chrome 幫我進目前後台，找出今天新增的訂單數量。"],
-      ["後台", "搜尋客戶", "用 Chrome 幫我在後台搜尋客戶「＿＿＿」，整理他的基本資料和最近紀錄。"],
-      ["後台", "待處理清單", "用 Chrome 幫我檢查後台裡狀態是「待處理」的項目，列成表格給我。"],
-      ["後台", "下載報表", "用 Chrome 幫我下載後台今天的報表，下載後告訴我檔名。"],
-      ["測試", "登入流程", "用 Chrome 幫我測試這個網站的登入流程：輸入帳號密碼後，確認是否成功進入首頁。"],
-      ["測試", "測試按鈕", "用 Chrome 幫我測試目前頁面的所有按鈕，告訴我哪些可以正常點、哪些沒有反應。"],
-      ["測試", "手機版跑版", "用 Chrome 幫我測試手機版畫面，看文字或按鈕有沒有重疊。"],
-      ["測試", "購物流程", "用 Chrome 幫我測試購物流程：加入購物車、進入結帳頁，但不要付款。"],
-      ["研究", "比較商品", "用 Chrome 幫我比較這三個商品頁面的價格、規格、運費和保固：\n1.\n2.\n3."],
-      ["研究", "整理重點", "用 Chrome 幫我讀目前頁面，整理成 5 個重點。"],
-      ["研究", "擷取表格", "用 Chrome 幫我把目前頁面的表格整理成 Markdown 表格。"],
-      ["研究", "擷取聯絡資訊", "用 Chrome 幫我從目前頁面找出所有 Email 和電話。"],
-      ["安全", "修改前確認", "用 Chrome 幫我找出可以修改的地方，但任何儲存、送出、刪除動作都要先問我。"],
-      ["安全", "等我說開始", "用 Chrome 幫我檢查這份資料，列出你準備修改的項目，等我說「開始」才修改。"],
-      ["安全", "高風險停下", "用 Chrome 幫我完成這個流程，但遇到付款、送出、刪除、公開發布時一定要停下來。"],
-      ["安全", "萬用模板", "用 Chrome 幫我操作目前頁面。\n我要達成：＿＿＿\n資料在：＿＿＿\n要新增/修改成：＿＿＿\n限制：送出、刪除、付款、公開前都要先問我。\n完成後請回報你改了哪裡。"]
+      ["教材", "族語詞卡工具", "請幫我設計一個族語詞卡小工具。\n需求：可輸入族語、中文、例句、主題分類，產生可列印的詞卡。\n請先列出欄位、操作流程、卡片版面，再給 Codex 實作指令。"],
+      ["教材", "例句練習產生器", "請根據以下族語詞彙設計 5 題例句練習。\n詞彙：＿＿＿\n族語別：＿＿＿\n輸出：題目、提示、答案、適合程度、可放進網頁的資料格式。"],
+      ["教材", "族語發音練習頁", "請幫我規劃一個族語發音練習網頁，可以放音檔、中文意思、跟讀按鈕和自評選項。請輸出 UI 區塊、資料結構與測試清單。"],
+      ["遊戲", "族語配對遊戲", "請幫我做一個族語配對遊戲：左邊是族語詞，右邊是中文意思。學生配對成功後給回饋。請先設計規則、狀態、得分方式，再產出 Codex 實作指令。"],
+      ["遊戲", "翻牌記憶遊戲", "請把以下族語詞彙做成翻牌記憶遊戲。\n詞彙資料：＿＿＿\n需求：每組包含族語與中文，翻到正確一組就保留，最後顯示完成時間與錯誤次數。"],
+      ["遊戲", "聽力選擇題", "請設計一個族語聽力選擇題工具：播放音檔後，學生從 4 個中文意思中選答案。請包含題庫格式、答題回饋、重新開始功能。"],
+      ["管理", "老師課程管理", "請幫我把族語老師課程資料整理成管理工具。\n資料包含：老師、語別、日期、堂數、助教、備註。\n請設計可新增、刪除、編輯、匯出報表的前端流程。"],
+      ["管理", "學生練習紀錄", "請設計一個族語學生練習紀錄頁，可以記錄學生姓名、練習主題、答對題數、需要複習的詞。請輸出資料欄位和 UI 版面。"],
+      ["報表", "族語家教截圖報表", "請幫我檢查目前的族語家教截圖報表工具。\n目標：每位老師一張卡片、每個日期只取一張、可刪除老師或單堂課、可列印鐘點費表。\n請列出測試步驟。"],
+      ["報表", "鐘點費明細表", "請幫我設計一個可編輯的鐘點費明細表。\n欄位：老師、身分證、地址、銀行、電話、語別、日期、堂數、單價、金額。\n需求：所有儲存格可直接編輯，列印時乾淨。"],
+      ["測試", "族語遊戲測試清單", "請幫我測試這個族語遊戲網頁。\n請檢查：手機版是否可玩、按鈕是否清楚、答錯是否有回饋、重新開始是否正常、文字是否太小。"],
+      ["安全", "課務資料修改確認", "請幫我操作族語課務工具，但刪除老師、刪除堂數、送出表單、覆蓋資料前都要先停下來確認。完成後回報你改了哪些資料。"]
     ];
 
     const cards = document.querySelector("#cards");
