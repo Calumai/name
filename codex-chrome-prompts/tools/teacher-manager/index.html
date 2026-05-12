@@ -47,7 +47,7 @@
     <div class="max-w-7xl mx-auto py-8 px-4 no-print">
         <header class="text-center mb-8">
             <div class="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-bold text-amber-800">
-                版本更新時間：2026-05-12 16:39（台北時間）｜老師截圖改為卡片預覽，鐘點費明細表可直接編輯
+                版本更新時間：2026-05-12 16:49（台北時間）｜可刪除整位老師或單一堂課，鐘點費會重新計算
             </div>
             <div class="mb-4">
                 <a href="../../" class="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800">
@@ -188,8 +188,12 @@
             renderAll();
         }
 
-        function openDeleteModal(teacher, date) {
-            pendingDeleteData = { teacher, date };
+        function openDeleteModal(teacher, date = null) {
+            pendingDeleteData = { teacher, date, type: date ? "lesson" : "teacher" };
+            const text = date
+                ? `您確定要刪除「${teacher}」的 ${date} 這堂課嗎？`
+                : `您確定要刪除「${teacher}」整位老師與全部課程嗎？`;
+            document.getElementById('deleteModalText').innerText = text;
             document.getElementById('deleteModal').classList.remove('hidden');
             document.getElementById('deleteModal').classList.add('flex');
         }
@@ -202,10 +206,14 @@
 
         document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
             if (pendingDeleteData) {
-                const { teacher, date } = pendingDeleteData;
-                delete currentTeacherGroups[teacher].dates[date];
-                if (Object.keys(currentTeacherGroups[teacher].dates).length === 0) {
+                const { teacher, date, type } = pendingDeleteData;
+                if (type === "teacher") {
                     delete currentTeacherGroups[teacher];
+                } else {
+                    delete currentTeacherGroups[teacher].dates[date];
+                    if (Object.keys(currentTeacherGroups[teacher].dates).length === 0) {
+                        delete currentTeacherGroups[teacher];
+                    }
                 }
                 renderAll();
             }
@@ -270,8 +278,8 @@
                             <td class="p-4 relative group thumbnail-container">
                                 <img src="${url}" class="w-[500px] mx-auto rounded border border-slate-100">
                                 <button onclick="openDeleteModal('${teacherKey.replace(/'/g, "\\'")}', '${date}')"
-                                        class="no-print delete-btn absolute top-6 right-6 bg-red-500 hover:bg-red-700 text-white p-2 rounded-full opacity-0 transition shadow-lg">
-                                    <i data-lucide="trash-2" class="w-5 h-5"></i>
+                                        class="no-print absolute top-6 right-6 bg-red-500 hover:bg-red-700 text-white px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition shadow-lg flex items-center gap-1 text-sm font-bold">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i> 刪除本堂
                                 </button>
                             </td>
                         </tr>
@@ -286,9 +294,14 @@
                                 <h3 class="text-xl font-bold text-slate-800">${group.displayName}</h3>
                                 <p class="text-sm text-slate-500 mt-1">共 ${sortedDates.length} 堂｜${firstDate} - ${lastDate}</p>
                             </div>
-                            <button onclick="printSingleTeacher(${index})" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm font-bold flex items-center gap-1 shadow-md shrink-0">
-                                <i data-lucide="printer" class="w-4 h-4"></i> PDF
-                            </button>
+                            <div class="flex gap-2 shrink-0">
+                                <button onclick="openDeleteModal('${teacherKey.replace(/'/g, "\\'")}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm font-bold flex items-center gap-1 shadow-md">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i> 刪除老師
+                                </button>
+                                <button onclick="printSingleTeacher(${index})" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm font-bold flex items-center gap-1 shadow-md">
+                                    <i data-lucide="printer" class="w-4 h-4"></i> PDF
+                                </button>
+                            </div>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
                             <label class="grid gap-1 text-xs font-bold text-slate-500">
