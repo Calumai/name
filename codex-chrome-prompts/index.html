@@ -466,26 +466,19 @@
       <div class="section-title">
         <div>
           <h2>訪客匿名回饋</h2>
-          <p>先做成前端版，留言和星等會存在這台瀏覽器；之後可再接共用資料庫。</p>
+          <p>改用 Google 表單收集星等與匿名留言，訪客不需要在你的電腦上操作。</p>
         </div>
       </div>
       <div class="wide-grid">
-        <form id="feedbackForm" class="card">
+        <article class="card">
           <h3>留下回饋</h3>
-          <select class="search" id="feedbackRating" aria-label="星等">
-            <option value="5">5 星：很有幫助</option>
-            <option value="4">4 星：好用</option>
-            <option value="3">3 星：可以再調整</option>
-            <option value="2">2 星：有點難用</option>
-            <option value="1">1 星：需要重做</option>
-          </select>
-          <textarea class="search" id="feedbackMessage" rows="4" placeholder="匿名留言：例如哪個族語工具最好用、哪裡需要改" aria-label="匿名留言"></textarea>
-          <button class="copy" type="submit">送出回饋</button>
-        </form>
+          <p>表單已設定為星等評比與匿名留言。提醒訪客不要填寫身分證、電話、地址或其他個人資料。</p>
+          <a class="copy" href="https://docs.google.com/forms/d/e/1FAIpQLSfCCfNh2NiaA90aneGBDRAvDS9iLrPVY4D7FcaS10kZb9ofvw/viewform?usp=sf_link" target="_blank" rel="noopener">開啟匿名回饋表單</a>
+        </article>
         <div class="card">
           <h3>回饋牆</h3>
-          <div id="feedbackList" class="grid"></div>
-          <p id="feedbackEmpty">尚無回饋。</p>
+          <p>目前已建立回覆試算表。等你同意把回覆資料公開成唯讀資料來源後，這裡就能自動顯示公開留言與平均星等。</p>
+          <span class="hint">下一步：公開留言牆資料源</span>
         </div>
       </div>
     </section>
@@ -647,9 +640,7 @@ Chrome：GitHub Pages 發布檢查
     });
 
     const homeworkKey = "indigenousToolHomework";
-    const feedbackKey = "indigenousToolFeedback";
     const homeworkForm = document.querySelector("#homeworkForm");
-    const feedbackForm = document.querySelector("#feedbackForm");
     const today = new Date();
     document.querySelector("#homeworkDate").value = today.toISOString().slice(0, 10);
 
@@ -687,27 +678,6 @@ Chrome：GitHub Pages 發布檢查
       });
     }
 
-    function renderFeedback() {
-      const list = document.querySelector("#feedbackList");
-      const empty = document.querySelector("#feedbackEmpty");
-      const items = readItems(feedbackKey).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-      empty.style.display = items.length ? "none" : "block";
-      list.innerHTML = items.map(item => `
-        <article class="card">
-          <span class="status">${"★".repeat(Number(item.rating))}${"☆".repeat(5 - Number(item.rating))}</span>
-          <p>${escapeHtml(item.message)}</p>
-          <span class="hint">${escapeHtml(item.createdAt.slice(0, 10))}</span>
-          <button class="pill" type="button" data-delete-feedback="${item.id}">刪除</button>
-        </article>
-      `).join("");
-      list.querySelectorAll("[data-delete-feedback]").forEach(button => {
-        button.addEventListener("click", () => {
-          saveItems(feedbackKey, readItems(feedbackKey).filter(item => item.id !== button.dataset.deleteFeedback));
-          renderFeedback();
-        });
-      });
-    }
-
     homeworkForm.addEventListener("submit", event => {
       event.preventDefault();
       const item = {
@@ -724,25 +694,9 @@ Chrome：GitHub Pages 發布檢查
       renderHomework();
     });
 
-    feedbackForm.addEventListener("submit", event => {
-      event.preventDefault();
-      const message = document.querySelector("#feedbackMessage").value.trim();
-      if (!message) return;
-      const item = {
-        id: crypto.randomUUID(),
-        rating: document.querySelector("#feedbackRating").value,
-        message,
-        createdAt: new Date().toISOString()
-      };
-      saveItems(feedbackKey, [item, ...readItems(feedbackKey)]);
-      feedbackForm.reset();
-      renderFeedback();
-    });
-
     search.addEventListener("input", render);
     render();
     renderHomework();
-    renderFeedback();
   </script>
 </body>
 </html>
