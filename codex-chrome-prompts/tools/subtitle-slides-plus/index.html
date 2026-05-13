@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>字幕投影片 Plus</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #191b18;
+        --muted: #66706b;
+        --panel: #f8f7f2;
+        --line: #d8d2c3;
+        --green: #7f9f3a;
+        --red: #ff1d12;
+        --orange: #eb7200;
+        --dark: #1f2721;
+        --mint: #9ccfbd;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--ink);
+        background: #202720;
+        font-family: "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+      }
+
+      button, textarea, input, select { font: inherit; }
+
+      button {
+        min-height: 40px;
+        border: 1px solid #bdb5a4;
+        border-radius: 7px;
+        background: #fffaf0;
+        color: var(--ink);
+        cursor: pointer;
+      }
+
+      button.primary {
+        background: var(--orange);
+        border-color: var(--orange);
+        color: #1d1105;
+        font-weight: 800;
+      }
+
+      .app {
+        display: grid;
+        grid-template-columns: minmax(320px, 420px) minmax(0, 1fr);
+        min-height: 100vh;
+      }
+
+      .panel {
+        height: 100vh;
+        overflow: auto;
+        padding: 20px;
+        background: #f5f1e8;
+        border-right: 1px solid #cfc5b2;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: 28px;
+      }
+
+      .panel p {
+        margin: 0 0 16px;
+        color: var(--muted);
+        line-height: 1.55;
+      }
+
+      label {
+        display: block;
+        margin: 14px 0 8px;
+        font-weight: 800;
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 280px;
+        resize: vertical;
+        border: 1px solid #c6bea9;
+        border-radius: 8px;
+        padding: 12px;
+        background: #fffdf8;
+        color: var(--ink);
+        line-height: 1.5;
+      }
+
+      .row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .row > * { flex: 1; }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 110px 1fr;
+        gap: 10px;
+        align-items: center;
+        margin: 14px 0;
+      }
+
+      input[type="range"], select { width: 100%; }
+
+      .hint {
+        padding: 12px;
+        border: 1px dashed #c6bea9;
+        border-radius: 8px;
+        background: #fffaf0;
+        color: #5d5548;
+        font-size: 14px;
+      }
+
+      .workspace {
+        display: grid;
+        align-content: center;
+        justify-items: center;
+        gap: 12px;
+        padding: 22px;
+      }
+
+      .stage {
+        position: relative;
+        width: min(calc(100vw - 480px), calc((100vh - 74px) * 16 / 9));
+        min-width: 420px;
+        aspect-ratio: 16 / 9;
+        overflow: hidden;
+        background: #e8e8e6;
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.32);
+      }
+
+      .stage::before,
+      .stage::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        width: 100%;
+        height: 6.8%;
+        background:
+          radial-gradient(circle, #f5f0d8 0 3px, transparent 4px) 0 50% / 34px 100% repeat-x,
+          linear-gradient(90deg, transparent 0 18px, #f5f0d8 18px 20px, transparent 20px 34px) 0 50% / 82px 100% repeat-x,
+          var(--dark);
+      }
+
+      .stage::before { top: 0; }
+      .stage::after {
+        bottom: 0;
+        background:
+          radial-gradient(circle, #253026 0 3px, transparent 4px) 0 50% / 34px 100% repeat-x,
+          linear-gradient(90deg, transparent 0 18px, #253026 18px 20px, transparent 20px 34px) 0 50% / 82px 100% repeat-x,
+          var(--mint);
+      }
+
+      .slide {
+        position: absolute;
+        inset: 8% 6% 9%;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        gap: 10px;
+        font-family: "Noto Serif TC", "PMingLiU", serif;
+      }
+
+      .title {
+        text-align: center;
+        font-size: 38px;
+        letter-spacing: 0;
+        font-weight: 700;
+      }
+
+      .content {
+        display: grid;
+        gap: 10px;
+        align-content: center;
+      }
+
+      .example {
+        display: grid;
+        gap: 8px;
+      }
+
+      .sentence {
+        font-size: 30px;
+        line-height: 1.2;
+        font-weight: 700;
+      }
+
+      .tokens {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px 18px;
+        align-items: flex-start;
+      }
+
+      .token {
+        min-width: 72px;
+        padding: 5px 8px 7px;
+        font-size: 30px;
+        line-height: 1.15;
+      }
+
+      .token strong {
+        display: block;
+        text-decoration: underline wavy #c90000 1px;
+      }
+
+      .token span {
+        display: block;
+        margin-top: 4px;
+        font-size: 19px;
+        font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      }
+
+      .token.mark-red { border: 4px solid var(--red); }
+      .token.mark-green { border: 4px solid #526b2c; }
+
+      .translation {
+        text-align: center;
+        font-size: 30px;
+        line-height: 1.25;
+      }
+
+      .badge {
+        justify-self: end;
+        align-self: center;
+        padding: 8px 20px;
+        min-width: 128px;
+        text-align: center;
+        font-family: "Noto Serif TC", "PMingLiU", serif;
+        font-size: 28px;
+        font-weight: 900;
+        background: var(--orange);
+      }
+
+      .badge.green { background: var(--green); }
+
+      .footer {
+        display: flex;
+        justify-content: space-between;
+        color: #5f665f;
+        font-size: 14px;
+        font-family: "Noto Sans TC", sans-serif;
+      }
+
+      .presenting .panel,
+      .presenting .caption {
+        display: none;
+      }
+
+      .presenting .app { display: block; }
+      .presenting .workspace {
+        width: 100vw;
+        height: 100vh;
+        padding: 0;
+        background: #000;
+      }
+      .presenting .stage {
+        width: 100vw;
+        height: 100vh;
+        min-width: 0;
+      }
+
+      @media (max-width: 980px) {
+        .app { grid-template-columns: 1fr; }
+        .panel {
+          height: auto;
+          border-right: 0;
+          border-bottom: 1px solid #cfc5b2;
+        }
+        .stage {
+          width: min(100%, calc((100vh - 120px) * 16 / 9));
+          min-width: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app">
+      <aside class="panel">
+        <h1>字幕投影片 Plus</h1>
+        <p>適合語法、例句、詞語拆解和事件標註。貼上結構化文字後，自動產生 1920 x 1080 教學投影片。</p>
+
+        <label for="source">講解資料</label>
+        <textarea id="source" spellcheck="false"></textarea>
+
+        <div class="row">
+          <button id="generate" class="primary">生成 Plus 投影片</button>
+          <button id="present">全螢幕</button>
+        </div>
+
+        <div class="grid">
+          <label for="scale">整體大小</label>
+          <input id="scale" type="range" min="80" max="120" value="100" />
+          <label for="theme">標籤顏色</label>
+          <select id="theme">
+            <option value="orange">橘色重點</option>
+            <option value="green">綠色重點</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <button id="prev">上一頁</button>
+          <output id="page">1 / 1</output>
+          <button id="next">下一頁</button>
+        </div>
+
+        <div class="hint">
+          格式：每張用空白行分開。<br>
+          `#` 標題，`@` 事件標籤，`>` 中文翻譯。<br>
+          詞語用 `詞=解釋=red` 或 `詞=解釋=green`。
+        </div>
+      </aside>
+
+      <section class="workspace">
+        <div id="stage" class="stage" aria-label="Plus 投影片預覽">
+          <section id="slide" class="slide"></section>
+        </div>
+        <p class="caption">左右鍵換頁，Esc 離開全螢幕。</p>
+      </section>
+    </main>
+
+    <script>
+      const sample = `# 時貌標記
+@ 單一事件
+a. qatiw pa iku sa kalingku Rasa tu baut.
+qatiw=去=red | pa=未來=red | iku=我.主格=red | sa=處所格 | kalingku=花蓮 | Rasa=買=red | tu=斜格 | baut=魚
+> 我要去花蓮買魚。
+
+# 時貌標記
+@ 兩個事件
+b. qatiw pa iku sa kalingku; Rasa pa iku tu baut.
+qatiw=去=green | pa=未來=green | iku=我.主格=green | sa=處所格 | kalingku=花蓮
+Rasa=買=green | pa=未來=green | iku=我.主格=green | tu=斜格 | baut=魚
+> 我要去花蓮；另外我要買魚。`;
+
+      const state = { slides: [], current: 0 };
+      const source = document.querySelector("#source");
+      const slide = document.querySelector("#slide");
+      const page = document.querySelector("#page");
+      const scale = document.querySelector("#scale");
+      const theme = document.querySelector("#theme");
+
+      function parseSlides(text) {
+        return text.trim().split(/\n\s*\n/).map(block => {
+          const lines = block.split("\n").map(line => line.trim()).filter(Boolean);
+          const parsed = { title: "語法講解", badge: "", sentence: "", translation: "", tokenLines: [] };
+          lines.forEach(line => {
+            if (line.startsWith("#")) parsed.title = line.replace(/^#+\s*/, "");
+            else if (line.startsWith("@")) parsed.badge = line.replace(/^@\s*/, "");
+            else if (line.startsWith(">")) parsed.translation = line.replace(/^>\s*/, "");
+            else if (line.includes("=")) parsed.tokenLines.push(line);
+            else parsed.sentence = line;
+          });
+          return parsed;
+        });
+      }
+
+      function parseTokens(lines) {
+        return lines.flatMap(line => line.split("|")).map(part => {
+          const [word = "", note = "", mark = ""] = part.trim().split("=");
+          return { word: word.trim(), note: note.trim(), mark: mark.trim() };
+        }).filter(token => token.word);
+      }
+
+      function render() {
+        const item = state.slides[state.current] || parseSlides(sample)[0];
+        const tokens = parseTokens(item.tokenLines);
+        const badgeClass = theme.value === "green" || item.badge.includes("兩") ? "green" : "";
+        slide.style.transform = `scale(${Number(scale.value) / 100})`;
+        slide.style.transformOrigin = "center";
+        slide.innerHTML = `
+          <div class="title" contenteditable="true">${escapeHtml(item.title)}</div>
+          <div class="content">
+            <div class="example">
+              <div class="sentence" contenteditable="true">${escapeHtml(item.sentence)}</div>
+              <div class="tokens">
+                ${tokens.map(token => `
+                  <div class="token ${token.mark === "red" ? "mark-red" : ""} ${token.mark === "green" ? "mark-green" : ""}" contenteditable="true">
+                    <strong>${escapeHtml(token.word)}</strong>
+                    <span>${escapeHtml(token.note)}</span>
+                  </div>
+                `).join("")}
+                ${item.badge ? `<div class="badge ${badgeClass}" contenteditable="true">${escapeHtml(item.badge)}</div>` : ""}
+              </div>
+              <div class="translation" contenteditable="true">${escapeHtml(item.translation)}</div>
+            </div>
+          </div>
+          <div class="footer"><span>${new Date().toLocaleDateString("zh-TW")}</span><span>${state.current + 1}</span></div>
+        `;
+        page.value = `${state.current + 1} / ${state.slides.length || 1}`;
+      }
+
+      function escapeHtml(value) {
+        return value.replace(/[&<>"']/g, char => ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#039;"
+        }[char]));
+      }
+
+      function generate() {
+        state.slides = parseSlides(source.value || sample);
+        state.current = 0;
+        localStorage.setItem("subtitleSlidesPlusSource", source.value);
+        render();
+      }
+
+      function move(delta) {
+        if (!state.slides.length) return;
+        state.current = Math.max(0, Math.min(state.current + delta, state.slides.length - 1));
+        render();
+      }
+
+      document.querySelector("#generate").addEventListener("click", generate);
+      document.querySelector("#prev").addEventListener("click", () => move(-1));
+      document.querySelector("#next").addEventListener("click", () => move(1));
+      scale.addEventListener("input", render);
+      theme.addEventListener("change", render);
+      document.querySelector("#present").addEventListener("click", async () => {
+        document.body.classList.add("presenting");
+        await document.documentElement.requestFullscreen?.();
+      });
+      document.addEventListener("fullscreenchange", () => {
+        if (!document.fullscreenElement) document.body.classList.remove("presenting");
+      });
+      document.addEventListener("keydown", event => {
+        if (event.key === "ArrowLeft") move(-1);
+        if (event.key === "ArrowRight") move(1);
+      });
+
+      source.value = localStorage.getItem("subtitleSlidesPlusSource") || sample;
+      generate();
+    </script>
+  </body>
+</html>
