@@ -47,7 +47,7 @@
     <div class="max-w-7xl mx-auto py-8 px-4 no-print">
         <header class="text-center mb-8">
             <div class="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-bold text-amber-800">
-                版本更新時間：2026-05-12 16:49（台北時間）｜可刪除整位老師或單一堂課，鐘點費會重新計算
+                版本更新時間：2026-05-13 21:39（台北時間）｜PDF 改用獨立列印視窗，領據個資不寫入程式碼
             </div>
             <div class="mb-4">
                 <a href="../../" class="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800">
@@ -111,8 +111,13 @@
     <script>
         lucide.createIcons();
 
-        const teacherDB = {
-           
+        const teacherDB = {};
+
+        const assistantMap = {
+            "張月瑛": "蔡儀婷", "石佳蓉": "邱意庭", "劉立雲": "尤敏", "林成遠": "陳冠萍",
+            "林秋英": "邱佳萍", "打亥": "陳冠萍", "鄭春美": "尤敏", "楊寶珠": "邱佳萍",
+            "柯菊華": "邱佳萍", "彭甄琳": "林潔", "胡美芳": "尤敏"
+        };
 
         let currentTeacherGroups = {};
         let pendingDeleteData = null;
@@ -203,19 +208,44 @@
         });
 
         function printSingleTeacher(index) {
-            const allBlocks = document.querySelectorAll('.teacher-block');
-            allBlocks.forEach((block, idx) => {
-                if (idx === index) {
-                    block.classList.remove('no-print');
-                } else {
-                    block.classList.add('no-print');
-                }
-            });
+            const block = document.querySelectorAll('.teacher-block')[index];
+            if (!block) return;
 
-            setTimeout(() => {
-                window.print();
-                allBlocks.forEach(block => block.classList.remove('no-print'));
-            }, 50);
+            const report = block.querySelector('.print-section');
+            if (!report) return;
+
+            const printWindow = window.open('', '_blank');
+            if (!printWindow) {
+                alert('瀏覽器封鎖了列印視窗，請允許彈出視窗後再試一次。');
+                return;
+            }
+
+            printWindow.document.write(`
+                <!doctype html>
+                <html lang="zh-TW">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>匯出老師截圖報表</title>
+                    <script src="https://cdn.tailwindcss.com"><\/script>
+                    <style>
+                        body { background: white; margin: 0; padding: 24px; font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif; }
+                        table { border-collapse: collapse; width: 100%; }
+                        th, td { border: 1px solid black; padding: 4px; }
+                        img { max-width: 500px; height: auto; }
+                        @media print { body { padding: 0; } }
+                    </style>
+                </head>
+                <body>
+                    ${report.innerHTML}
+                    <script>
+                        window.addEventListener('load', () => {
+                            setTimeout(() => window.print(), 300);
+                        });
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
         }
 
         function renderAll() {
@@ -374,7 +404,7 @@
             let overallTotal = 0;
             Object.keys(currentTeacherGroups).sort().forEach((key, idx) => {
                 const group = currentTeacherGroups[key];
-                const info = teacherDB[key] || { id: "-", addr: "-", bank: "-", tel: "-", time: "19:00-21:00", lang: group.lang };
+                const info = teacherDB[key] || { id: "", addr: "", bank: "", tel: "", time: "", lang: group.lang };
                 const dates = Object.keys(group.dates).sort();
                 const totalPay = dates.length * 2 * unitPrice;
                 overallTotal += totalPay;
