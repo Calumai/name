@@ -116,6 +116,33 @@
         font-size: 14px;
       }
 
+      .format-guide {
+        display: grid;
+        gap: 10px;
+        margin: 14px 0;
+      }
+
+      .rule {
+        padding: 10px 12px;
+        border: 1px solid #d3cab7;
+        border-radius: 8px;
+        background: #fffdf8;
+        line-height: 1.45;
+      }
+
+      .rule code {
+        display: inline-block;
+        padding: 2px 6px;
+        border-radius: 5px;
+        background: #ece5d6;
+        font-family: ui-monospace, Consolas, monospace;
+      }
+
+      .rule strong {
+        display: block;
+        margin-bottom: 4px;
+      }
+
       .workspace {
         display: grid;
         align-content: center;
@@ -292,6 +319,11 @@
           <button id="present">全螢幕</button>
         </div>
 
+        <div class="row">
+          <button id="copyTemplate">複製範本</button>
+          <button id="downloadTemplate">下載範本</button>
+        </div>
+
         <div class="grid">
           <label for="scale">整體大小</label>
           <input id="scale" type="range" min="80" max="120" value="100" />
@@ -313,6 +345,29 @@
           `#` 標題，`@` 事件標籤，`>` 中文翻譯。<br>
           詞語用 `詞=解釋=red` 或 `詞=解釋=green`。
         </div>
+
+        <section class="format-guide" aria-label="格式說明">
+          <div class="rule">
+            <strong>標題</strong>
+            <code># 時貌標記</code> 會變成投影片最上方的大標題。
+          </div>
+          <div class="rule">
+            <strong>事件標籤</strong>
+            <code>@ 單一事件</code> 或 <code>@ 兩個事件</code> 會變成右側色塊標籤。
+          </div>
+          <div class="rule">
+            <strong>紅框 / 綠框</strong>
+            <code>qatiw=去=red</code> 會有紅框；<code>Rasa=買=green</code> 會有綠框；不寫顏色就不加框。
+          </div>
+          <div class="rule">
+            <strong>中文翻譯</strong>
+            <code>&gt; 我要去花蓮買魚。</code> 會放在投影片下方。
+          </div>
+          <div class="rule">
+            <strong>新的一張投影片</strong>
+            兩張投影片中間留一個空白行。
+          </div>
+        </section>
       </aside>
 
       <section class="workspace">
@@ -324,7 +379,7 @@
     </main>
 
     <script>
-      const sample = `# 時貌標記
+      const template = `# 時貌標記
 @ 單一事件
 a. qatiw pa iku sa kalingku Rasa tu baut.
 qatiw=去=red | pa=未來=red | iku=我.主格=red | sa=處所格 | kalingku=花蓮 | Rasa=買=red | tu=斜格 | baut=魚
@@ -336,6 +391,8 @@ b. qatiw pa iku sa kalingku; Rasa pa iku tu baut.
 qatiw=去=green | pa=未來=green | iku=我.主格=green | sa=處所格 | kalingku=花蓮
 Rasa=買=green | pa=未來=green | iku=我.主格=green | tu=斜格 | baut=魚
 > 我要去花蓮；另外我要買魚。`;
+
+      const sample = template;
 
       const state = { slides: [], current: 0 };
       const source = document.querySelector("#source");
@@ -420,6 +477,18 @@ Rasa=買=green | pa=未來=green | iku=我.主格=green | tu=斜格 | baut=魚
       document.querySelector("#generate").addEventListener("click", generate);
       document.querySelector("#prev").addEventListener("click", () => move(-1));
       document.querySelector("#next").addEventListener("click", () => move(1));
+      document.querySelector("#copyTemplate").addEventListener("click", async () => {
+        await navigator.clipboard.writeText(template);
+      });
+      document.querySelector("#downloadTemplate").addEventListener("click", () => {
+        const blob = new Blob([template], { type: "text/plain;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "字幕投影片Plus範本.txt";
+        link.click();
+        URL.revokeObjectURL(url);
+      });
       scale.addEventListener("input", render);
       theme.addEventListener("change", render);
       document.querySelector("#present").addEventListener("click", async () => {
