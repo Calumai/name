@@ -355,6 +355,8 @@
       <a href="#dashboard">族語工具儀表板</a>
       <a href="#tools">教學工具區</a>
       <a href="#prompts">族語工具指令庫</a>
+      <a href="#homework">每日作業</a>
+      <a href="#feedback">訪客回饋</a>
       <a href="#projects">作品成果</a>
       <a href="#routine">每日練習流程</a>
     </div>
@@ -433,6 +435,58 @@
         </div>
         <section id="cards" class="grid" aria-live="polite"></section>
         <div id="empty" class="empty">找不到符合的指令，換個關鍵字試試。</div>
+      </div>
+    </section>
+
+    <section id="homework">
+      <div class="section-title">
+        <div>
+          <h2>每日作業紀錄</h2>
+          <p>每天把完成的族語工具、遊戲或教材網址貼上來，慢慢累積成學習軌跡。</p>
+        </div>
+      </div>
+      <div class="wide-grid">
+        <form id="homeworkForm" class="card">
+          <h3>新增今天的作業</h3>
+          <input class="search" id="homeworkDate" type="date" aria-label="作業日期">
+          <input class="search" id="homeworkTitle" type="text" placeholder="作業名稱，例如：族語配對遊戲 Day 1" aria-label="作業名稱">
+          <input class="search" id="homeworkUrl" type="url" placeholder="作業網址 https://..." aria-label="作業網址">
+          <textarea class="search" id="homeworkNote" rows="4" placeholder="今天練到什麼、遇到什麼問題、下一步要做什麼" aria-label="作業備註"></textarea>
+          <button class="copy" type="submit">新增作業</button>
+        </form>
+        <div class="card">
+          <h3>作業列表</h3>
+          <div id="homeworkList" class="grid"></div>
+          <p id="homeworkEmpty">還沒有作業紀錄。今天先貼第一個網址。</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="feedback">
+      <div class="section-title">
+        <div>
+          <h2>訪客匿名回饋</h2>
+          <p>先做成前端版，留言和星等會存在這台瀏覽器；之後可再接共用資料庫。</p>
+        </div>
+      </div>
+      <div class="wide-grid">
+        <form id="feedbackForm" class="card">
+          <h3>留下回饋</h3>
+          <select class="search" id="feedbackRating" aria-label="星等">
+            <option value="5">5 星：很有幫助</option>
+            <option value="4">4 星：好用</option>
+            <option value="3">3 星：可以再調整</option>
+            <option value="2">2 星：有點難用</option>
+            <option value="1">1 星：需要重做</option>
+          </select>
+          <textarea class="search" id="feedbackMessage" rows="4" placeholder="匿名留言：例如哪個族語工具最好用、哪裡需要改" aria-label="匿名留言"></textarea>
+          <button class="copy" type="submit">送出回饋</button>
+        </form>
+        <div class="card">
+          <h3>回饋牆</h3>
+          <div id="feedbackList" class="grid"></div>
+          <p id="feedbackEmpty">尚無回饋。</p>
+        </div>
       </div>
     </section>
 
@@ -592,8 +646,103 @@ Chrome：GitHub Pages 發布檢查
       });
     });
 
+    const homeworkKey = "indigenousToolHomework";
+    const feedbackKey = "indigenousToolFeedback";
+    const homeworkForm = document.querySelector("#homeworkForm");
+    const feedbackForm = document.querySelector("#feedbackForm");
+    const today = new Date();
+    document.querySelector("#homeworkDate").value = today.toISOString().slice(0, 10);
+
+    function readItems(key) {
+      try {
+        return JSON.parse(localStorage.getItem(key)) || [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveItems(key, items) {
+      localStorage.setItem(key, JSON.stringify(items));
+    }
+
+    function renderHomework() {
+      const list = document.querySelector("#homeworkList");
+      const empty = document.querySelector("#homeworkEmpty");
+      const items = readItems(homeworkKey).sort((a, b) => b.date.localeCompare(a.date));
+      empty.style.display = items.length ? "none" : "block";
+      list.innerHTML = items.map(item => `
+        <article class="card">
+          <span class="status done">${escapeHtml(item.date)}</span>
+          <h3>${escapeHtml(item.title)}</h3>
+          <p>${escapeHtml(item.note || "未填備註")}</p>
+          <a class="pill" href="${escapeHtml(item.url)}" target="_blank" rel="noopener">開啟作業</a>
+          <button class="pill" type="button" data-delete-homework="${item.id}">刪除</button>
+        </article>
+      `).join("");
+      list.querySelectorAll("[data-delete-homework]").forEach(button => {
+        button.addEventListener("click", () => {
+          saveItems(homeworkKey, readItems(homeworkKey).filter(item => item.id !== button.dataset.deleteHomework));
+          renderHomework();
+        });
+      });
+    }
+
+    function renderFeedback() {
+      const list = document.querySelector("#feedbackList");
+      const empty = document.querySelector("#feedbackEmpty");
+      const items = readItems(feedbackKey).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+      empty.style.display = items.length ? "none" : "block";
+      list.innerHTML = items.map(item => `
+        <article class="card">
+          <span class="status">${"★".repeat(Number(item.rating))}${"☆".repeat(5 - Number(item.rating))}</span>
+          <p>${escapeHtml(item.message)}</p>
+          <span class="hint">${escapeHtml(item.createdAt.slice(0, 10))}</span>
+          <button class="pill" type="button" data-delete-feedback="${item.id}">刪除</button>
+        </article>
+      `).join("");
+      list.querySelectorAll("[data-delete-feedback]").forEach(button => {
+        button.addEventListener("click", () => {
+          saveItems(feedbackKey, readItems(feedbackKey).filter(item => item.id !== button.dataset.deleteFeedback));
+          renderFeedback();
+        });
+      });
+    }
+
+    homeworkForm.addEventListener("submit", event => {
+      event.preventDefault();
+      const item = {
+        id: crypto.randomUUID(),
+        date: document.querySelector("#homeworkDate").value,
+        title: document.querySelector("#homeworkTitle").value.trim() || "未命名族語作業",
+        url: document.querySelector("#homeworkUrl").value.trim(),
+        note: document.querySelector("#homeworkNote").value.trim()
+      };
+      if (!item.url) return;
+      saveItems(homeworkKey, [item, ...readItems(homeworkKey)]);
+      homeworkForm.reset();
+      document.querySelector("#homeworkDate").value = today.toISOString().slice(0, 10);
+      renderHomework();
+    });
+
+    feedbackForm.addEventListener("submit", event => {
+      event.preventDefault();
+      const message = document.querySelector("#feedbackMessage").value.trim();
+      if (!message) return;
+      const item = {
+        id: crypto.randomUUID(),
+        rating: document.querySelector("#feedbackRating").value,
+        message,
+        createdAt: new Date().toISOString()
+      };
+      saveItems(feedbackKey, [item, ...readItems(feedbackKey)]);
+      feedbackForm.reset();
+      renderFeedback();
+    });
+
     search.addEventListener("input", render);
     render();
+    renderHomework();
+    renderFeedback();
   </script>
 </body>
 </html>
