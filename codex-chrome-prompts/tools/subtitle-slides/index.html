@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI 練習字幕投影片</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <aside class="control-panel" aria-label="字幕設定">
+        <header class="panel-header">
+          <h1>字幕投影片</h1>
+          <p>貼上文字，自動切成 1920 x 1080 的老師觀看版字幕頁。</p>
+        </header>
+
+        <section class="tool-section">
+          <label for="sourceText">貼上原稿</label>
+          <textarea id="sourceText" spellcheck="false" placeholder="把逐字稿或講稿貼在這裡。支援中文標點、換行和空白分段。"></textarea>
+          <div class="button-row">
+            <button id="generateBtn" class="primary">生成投影片</button>
+            <button id="clearBtn" title="清空">清空</button>
+          </div>
+        </section>
+
+        <section class="tool-section compact-grid">
+          <label for="maxChars">每頁字數</label>
+          <input id="maxChars" type="number" min="12" max="90" value="18" />
+
+          <label for="fontSize">字體大小</label>
+          <input id="fontSize" type="range" min="44" max="132" value="72" />
+
+          <label for="lineHeight">行距</label>
+          <input id="lineHeight" type="range" min="105" max="155" value="122" />
+
+          <label for="subtitleWidth">字幕寬度</label>
+          <input id="subtitleWidth" type="range" min="55" max="92" value="86" />
+        </section>
+
+        <section class="tool-section">
+          <div class="segmented" role="group" aria-label="字幕位置">
+            <button class="position-option active" data-position="bottom">下方</button>
+            <button class="position-option" data-position="middle">中間</button>
+            <button class="position-option" data-position="top">上方</button>
+          </div>
+          <div class="toggle-row">
+            <label><input id="shadowToggle" type="checkbox" checked /> 黑色描邊</label>
+            <label><input id="safeToggle" type="checkbox" checked /> 安全框</label>
+          </div>
+        </section>
+
+        <section class="tool-section">
+          <div class="nav-row">
+            <button id="prevBtn" title="上一頁">←</button>
+            <output id="pageInfo">0 / 0</output>
+            <button id="nextBtn" title="下一頁">→</button>
+          </div>
+          <div class="button-row">
+            <button id="addSlideBtn">新增頁</button>
+            <button id="deleteSlideBtn">刪除頁</button>
+          </div>
+          <button id="presentBtn" class="wide">全螢幕播放</button>
+        </section>
+
+        <section class="tool-section slide-list-wrap">
+          <div class="list-title">頁面</div>
+          <ol id="slideList" class="slide-list"></ol>
+        </section>
+      </aside>
+
+      <section class="workspace" aria-label="字幕預覽">
+        <div id="stageFrame" class="stage-frame">
+          <div id="slideStage" class="slide-stage position-bottom">
+            <div id="safeFrame" class="safe-frame"></div>
+            <div id="subtitle" class="subtitle" contenteditable="true" spellcheck="false" aria-label="目前頁面字幕"></div>
+          </div>
+        </div>
+        <p class="hint">點字幕可直接修改。播放時可用 ← → 換頁，Esc 離開。</p>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
