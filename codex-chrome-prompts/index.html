@@ -477,8 +477,19 @@
         </article>
         <div class="card">
           <h3>回饋牆</h3>
-          <p>目前已建立回覆試算表。等你同意把回覆資料公開成唯讀資料來源後，這裡就能自動顯示公開留言與平均星等。</p>
-          <span class="hint">下一步：公開留言牆資料源</span>
+          <div class="metric">
+            <div>
+              <strong id="feedbackAverage">-</strong>
+              <span>平均星等</span>
+            </div>
+            <div>
+              <strong id="feedbackCount">0</strong>
+              <span>公開回覆</span>
+            </div>
+          </div>
+          <div id="feedbackList" class="grid"></div>
+          <p id="feedbackEmpty">尚無公開留言。送出第一則回饋後，稍等一下就會出現在這裡。</p>
+          <button class="pill" type="button" id="refreshFeedback">重新整理回饋</button>
         </div>
       </div>
     </section>
@@ -640,6 +651,7 @@ Chrome：GitHub Pages 發布檢查
     });
 
     const homeworkKey = "indigenousToolHomework";
+    const feedbackSheetUrl = "https://docs.google.com/spreadsheets/d/1dECVvGtsBp9obg8Ll8b_SrhZnwe7Gqadeoqj3X7pkZc/gviz/tq?tqx=out:json;responseHandler:renderPublicFeedback&gid=944769991";
     const homeworkForm = document.querySelector("#homeworkForm");
     const today = new Date();
     document.querySelector("#homeworkDate").value = today.toISOString().slice(0, 10);
@@ -678,6 +690,48 @@ Chrome：GitHub Pages 發布檢查
       });
     }
 
+    window.renderPublicFeedback = response => {
+      const rows = response?.table?.rows || [];
+      const items = rows.map(row => {
+        const cells = row.c || [];
+        return {
+          createdAt: cells[0]?.f || cells[0]?.v || "",
+          rating: Number(cells[1]?.v || 0),
+          message: String(cells[2]?.v || "").trim()
+        };
+      }).filter(item => item.rating && item.message);
+
+      const list = document.querySelector("#feedbackList");
+      const empty = document.querySelector("#feedbackEmpty");
+      const count = document.querySelector("#feedbackCount");
+      const average = document.querySelector("#feedbackAverage");
+      const total = items.reduce((sum, item) => sum + item.rating, 0);
+
+      count.textContent = items.length;
+      average.textContent = items.length ? (total / items.length).toFixed(1) : "-";
+      empty.style.display = items.length ? "none" : "block";
+      list.innerHTML = items.reverse().slice(0, 12).map(item => `
+        <article class="card">
+          <span class="status">${"★".repeat(item.rating)}${"☆".repeat(5 - item.rating)}</span>
+          <p>${escapeHtml(item.message)}</p>
+          <span class="hint">${escapeHtml(item.createdAt || "匿名訪客")}</span>
+        </article>
+      `).join("");
+    };
+
+    function loadPublicFeedback() {
+      document.querySelector("#feedbackEmpty").textContent = "正在讀取公開留言...";
+      const oldScript = document.querySelector("#feedbackSheetScript");
+      oldScript?.remove();
+      const script = document.createElement("script");
+      script.id = "feedbackSheetScript";
+      script.src = `${feedbackSheetUrl}&cache=${Date.now()}`;
+      script.onerror = () => {
+        document.querySelector("#feedbackEmpty").textContent = "目前讀不到公開留言，請稍後再試。";
+      };
+      document.body.appendChild(script);
+    }
+
     homeworkForm.addEventListener("submit", event => {
       event.preventDefault();
       const item = {
@@ -695,8 +749,10 @@ Chrome：GitHub Pages 發布檢查
     });
 
     search.addEventListener("input", render);
+    document.querySelector("#refreshFeedback").addEventListener("click", loadPublicFeedback);
     render();
     renderHomework();
+    loadPublicFeedback();
   </script>
 </body>
 </html>
