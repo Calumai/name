@@ -366,7 +366,7 @@
     <div class="wrap nav-inner">
       <a href="#dashboard">族語工具儀表板</a>
       <a href="#tools">教學工具區</a>
-      <a href="#prompts">族語工具指令庫</a>
+      <a href="#prompts">想做的工具</a>
       <a href="#homework">每日作業</a>
       <a href="#feedback">訪客回饋</a>
       <a href="#projects">作品成果</a>
@@ -385,7 +385,7 @@
       <div class="metric" aria-label="練習統計">
         <div><strong>5</strong><span>已完成族語工具</span></div>
         <div><strong>5/14</strong><span>最近練習</span></div>
-        <div><strong>12</strong><span>族語 AI 指令</span></div>
+        <div><strong>12</strong><span>想做工具</span></div>
         <div><strong>20-40</strong><span>每日分鐘</span></div>
         <div><strong>7</strong><span>第一週任務</span></div>
       </div>
@@ -401,9 +401,9 @@
       <div class="grid">
         <article class="card tool-card">
           <span class="status done">已完成</span>
-          <h3>族語工具指令庫</h3>
-          <p>把常用 AI 指令整理成卡片，快速生成教材、遊戲規則、測驗題與課務流程。</p>
-          <a class="pill" href="#prompts">前往族語指令庫</a>
+          <h3>想做的工具清單</h3>
+          <p>把想完成的教材、遊戲、報表和測試頁整理成卡片；完成後貼上網址，就能留下練習紀錄。</p>
+          <a class="pill" href="#prompts">前往工具清單</a>
         </article>
         <article class="card tool-card">
           <span class="status done">已完成</span>
@@ -429,13 +429,13 @@
     <section id="prompts">
       <div class="section-title">
         <div>
-          <h2>族語工具指令庫</h2>
-          <p>要做教材、遊戲、報表或測驗時，從這裡挑一張指令複製給 AI。</p>
+          <h2>想做的工具</h2>
+          <p>這裡只記錄「要呈現成什麼樣子」。你自己下提示詞，完成後把網址貼回來更新。</p>
         </div>
       </div>
       <div class="prompt-panel">
         <div class="prompt-top">
-          <div class="tabs" aria-label="指令分類">
+          <div class="tabs" aria-label="工具分類">
             <button class="tab" type="button" data-filter="all" aria-pressed="true">全部</button>
             <button class="tab" type="button" data-filter="教材">教材</button>
             <button class="tab" type="button" data-filter="遊戲">遊戲</button>
@@ -444,10 +444,10 @@
             <button class="tab" type="button" data-filter="測試">測試</button>
             <button class="tab" type="button" data-filter="安全">確認再動作</button>
           </div>
-          <input id="search" class="search" type="search" placeholder="搜尋：詞卡、配對、聽力、報表、族語..." aria-label="搜尋指令">
+          <input id="search" class="search" type="search" placeholder="搜尋：詞卡、配對、聽力、報表、族語..." aria-label="搜尋想做的工具">
         </div>
         <section id="cards" class="grid" aria-live="polite"></section>
-        <div id="empty" class="empty">找不到符合的指令，換個關鍵字試試。</div>
+        <div id="empty" class="empty">找不到符合的工具構想，換個關鍵字試試。</div>
       </div>
     </section>
 
@@ -592,23 +592,17 @@ Codex：建立 Excel 匯入、類別偵測、主題與級別篩選、詞卡編�
             <li><span class="box"></span><span>選一個族語教學場景：詞彙複習、聽力練習、配對遊戲、老師報表。</span></li>
             <li><span class="box"></span><span>請 AI 先拆出老師需求、學生操作方式和資料欄位。</span></li>
             <li><span class="box"></span><span>交給 Codex 做成網頁工具，並用 Chrome 測試實際操作。</span></li>
-            <li><span class="box"></span><span>把今天完成的族語工具和學到的指令補進成果區。</span></li>
+            <li><span class="box"></span><span>把今天完成的族語工具網址貼回首頁，更新日期和成果紀錄。</span></li>
           </ul>
         </article>
         <article class="card">
-          <h3>族語工具萬用指令</h3>
-          <pre id="dailyPrompt">我正在練習用多個 AI 協作製作族語教學網頁工具。
-請幫我把今天的任務拆成：
-1. 族語教學情境
-2. 老師需要的操作流程
-3. 學生會看到的互動方式
-4. Codex 實作指令
-5. 測試清單
-6. 要記錄到首頁的成果文字
-
-今天任務：＿＿＿
-限制：20-40 分鐘內完成，先求能在族語課堂使用，再慢慢美化。</pre>
-          <button class="copy" type="button" data-copy-target="dailyPrompt">複製每日指令</button>
+          <h3>完成後更新方式</h3>
+          <p>每次練習完成後，把工具網址貼到「想做的工具」對應卡片，也新增到每日作業紀錄。首頁上方的最後更新日期要同步改成當天日期。</p>
+          <ul class="checklist">
+            <li><span class="box"></span><span>貼上完成工具網址。</span></li>
+            <li><span class="box"></span><span>新增 Day 卡片或更新作品成果。</span></li>
+            <li><span class="box"></span><span>更新首頁最後更新日期。</span></li>
+          </ul>
         </article>
       </div>
     </section>
@@ -619,20 +613,23 @@ Codex：建立 Excel 匯入、類別偵測、主題與級別篩選、詞卡編�
   </footer>
 
   <script>
-    const prompts = [
-      ["教材", "族語詞卡工具", "請幫我設計一個族語詞卡小工具。\n需求：可輸入族語、中文、例句、主題分類，產生可列印的詞卡。\n請先列出欄位、操作流程、卡片版面，再給 Codex 實作指令。"],
-      ["教材", "例句練習產生器", "請根據以下族語詞彙設計 5 題例句練習。\n詞彙：＿＿＿\n族語別：＿＿＿\n輸出：題目、提示、答案、適合程度、可放進網頁的資料格式。"],
-      ["教材", "族語發音練習頁", "請幫我規劃一個族語發音練習網頁，可以放音檔、中文意思、跟讀按鈕和自評選項。請輸出 UI 區塊、資料結構與測試清單。"],
-      ["遊戲", "族語配對遊戲", "請幫我做一個族語配對遊戲：左邊是族語詞，右邊是中文意思。學生配對成功後給回饋。請先設計規則、狀態、得分方式，再產出 Codex 實作指令。"],
-      ["遊戲", "翻牌記憶遊戲", "請把以下族語詞彙做成翻牌記憶遊戲。\n詞彙資料：＿＿＿\n需求：每組包含族語與中文，翻到正確一組就保留，最後顯示完成時間與錯誤次數。"],
-      ["遊戲", "聽力選擇題", "請設計一個族語聽力選擇題工具：播放音檔後，學生從 4 個中文意思中選答案。請包含題庫格式、答題回饋、重新開始功能。"],
-      ["管理", "老師課程管理", "請幫我把族語老師課程資料整理成管理工具。\n資料包含：老師、語別、日期、堂數、助教、備註。\n請設計可新增、刪除、編輯、匯出報表的前端流程。"],
-      ["管理", "學生練習紀錄", "請設計一個族語學生練習紀錄頁，可以記錄學生姓名、練習主題、答對題數、需要複習的詞。請輸出資料欄位和 UI 版面。"],
-      ["報表", "族語家教截圖報表", "請幫我檢查目前的族語家教截圖報表工具。\n目標：每位老師一張卡片、每個日期只取一張、可刪除老師或單堂課、可列印鐘點費表。\n請列出測試步驟。"],
-      ["報表", "鐘點費明細表", "請幫我設計一個可編輯的鐘點費明細表。\n欄位：老師、身分證、地址、銀行、電話、語別、日期、堂數、單價、金額。\n需求：所有儲存格可直接編輯，列印時乾淨。"],
-      ["測試", "族語遊戲測試清單", "請幫我測試這個族語遊戲網頁。\n請檢查：手機版是否可玩、按鈕是否清楚、答錯是否有回饋、重新開始是否正常、文字是否太小。"],
-      ["安全", "課務資料修改確認", "請幫我操作族語課務工具，但刪除老師、刪除堂數、送出表單、覆蓋資料前都要先停下來確認。完成後回報你改了哪些資料。"]
+    const ideas = [
+      ["教材", "族語詞卡工具", "可以輸入或匯入族語、中文、例句、主題分類，產生適合 A4 列印的詞卡。畫面要能篩選主題、調整版面、修改單張詞卡。"],
+      ["教材", "例句練習產生器", "輸入一組族語詞彙後，產生課堂練習題。每題要有題目、提示、答案和適合程度，方便直接放進教材。"],
+      ["教材", "族語發音練習頁", "每張卡有族語、中文、音檔播放、跟讀提醒和自評選項。學生可以逐題練習，老師可以快速看哪些詞需要複習。"],
+      ["遊戲", "族語配對遊戲", "左邊顯示族語詞，右邊顯示中文意思。配對成功要有明確回饋，完成後顯示分數、時間和重新開始按鈕。"],
+      ["遊戲", "翻牌記憶遊戲", "卡片背面一致，翻開後配對族語與中文。答對保留、答錯蓋回去，最後顯示完成時間與錯誤次數。"],
+      ["遊戲", "聽力選擇題", "播放族語音檔後，學生從四個中文意思中選答案。答題後立即回饋，結束時顯示答對題數和需要複習的題目。"],
+      ["管理", "老師課程管理", "可以新增、編輯、刪除老師課程資料，欄位包含老師、語別、日期、堂數、助教、備註，並能匯出報表。"],
+      ["管理", "學生練習紀錄", "記錄學生姓名、練習主題、答對題數、需要複習的詞，讓老師可以追蹤每次練習狀況。"],
+      ["報表", "族語家教截圖報表", "每位老師一張卡片，每個日期只保留代表截圖；可刪除老師或單堂課，也能列印鐘點費表。"],
+      ["報表", "鐘點費明細表", "做成可編輯表格，包含老師、身分證、地址、銀行、電話、語別、日期、堂數、單價、金額，列印時乾淨清楚。"],
+      ["測試", "族語遊戲測試清單", "用來檢查遊戲是否適合上課：手機版是否可玩、按鈕是否清楚、答錯是否有回饋、重新開始是否正常、文字是否太小。"],
+      ["安全", "課務資料修改確認", "用來確認課務工具的重要操作。刪除老師、刪除堂數、送出表單、覆蓋資料前，要清楚顯示確認內容。"]
     ];
+
+    const ideaUrlKey = "indigenousToolIdeaUrls";
+    const ideaUrls = JSON.parse(localStorage.getItem(ideaUrlKey) || "{}");
 
     const cards = document.querySelector("#cards");
     const empty = document.querySelector("#empty");
@@ -642,26 +639,39 @@ Codex：建立 Excel 匯入、類別偵測、主題與級別篩選、詞卡編�
 
     function render() {
       const q = search.value.trim().toLowerCase();
-      const filtered = prompts.filter(([category, title, text]) => {
+      const filtered = ideas.filter(([category, title, description]) => {
         const inCategory = active === "all" || category === active;
-        const haystack = `${category} ${title} ${text}`.toLowerCase();
+        const haystack = `${category} ${title} ${description}`.toLowerCase();
         return inCategory && (!q || haystack.includes(q));
       });
 
-      cards.innerHTML = filtered.map(([category, title, text], index) => `
+      cards.innerHTML = filtered.map(([category, title, description]) => {
+        const savedUrl = ideaUrls[title] || "";
+        return `
         <article class="card">
           <span class="status">${category}</span>
           <h3>${title}</h3>
-          <pre>${escapeHtml(text)}</pre>
-          <button class="copy" type="button" data-prompt-index="${index}">複製</button>
-        </article>
-      `).join("");
+          <p>${escapeHtml(description)}</p>
+          <input class="search" type="url" value="${escapeHtml(savedUrl)}" placeholder="完成後貼上網址 https://..." data-idea-title="${escapeHtml(title)}" aria-label="${escapeHtml(title)}完成網址">
+          ${savedUrl ? `<a class="pill" href="${escapeHtml(savedUrl)}" target="_blank" rel="noopener">開啟成果</a>` : `<span class="status next">尚未完成</span>`}
+        </article>`;
+      }).join("");
 
-      cards.querySelectorAll("[data-prompt-index]").forEach((button, index) => {
-        button.addEventListener("click", async () => copyText(filtered[index][2], button));
+      cards.querySelectorAll("[data-idea-title]").forEach(input => {
+        input.addEventListener("change", () => saveIdeaUrl(input.dataset.ideaTitle, input.value.trim()));
       });
 
       empty.style.display = filtered.length ? "none" : "block";
+    }
+
+    function saveIdeaUrl(title, url) {
+      if (url) {
+        ideaUrls[title] = url;
+      } else {
+        delete ideaUrls[title];
+      }
+      localStorage.setItem(ideaUrlKey, JSON.stringify(ideaUrls));
+      render();
     }
 
     function escapeHtml(value) {
