@@ -1,0 +1,771 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>南勢阿美語詞卡產生器</title>
+    <script defer src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+      :root {
+        --ink: #20241f;
+        --muted: #667064;
+        --line: #d8decf;
+        --paper: #fffdf7;
+        --panel: #f2f6eb;
+        --accent: #2e765e;
+        --accent-dark: #1f5746;
+        --warm: #d78338;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        color: var(--ink);
+        background: #eef3e8;
+        font-family: "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+      }
+
+      button,
+      input,
+      select,
+      textarea {
+        font: inherit;
+      }
+
+      button {
+        border: 0;
+        cursor: pointer;
+      }
+
+      .app {
+        min-height: 100vh;
+        display: grid;
+        grid-template-columns: minmax(320px, 420px) 1fr;
+      }
+
+      aside {
+        padding: 24px;
+        background: var(--paper);
+        border-right: 1px solid var(--line);
+        overflow: auto;
+      }
+
+      main {
+        padding: 24px;
+        overflow: auto;
+      }
+
+      h1 {
+        margin: 0 0 6px;
+        font-size: 30px;
+        line-height: 1.2;
+      }
+
+      h2 {
+        margin: 22px 0 10px;
+        font-size: 17px;
+      }
+
+      p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.65;
+      }
+
+      .back {
+        display: inline-flex;
+        margin-bottom: 18px;
+        color: var(--accent-dark);
+        text-decoration: none;
+        font-weight: 700;
+      }
+
+      .drop {
+        margin-top: 18px;
+        padding: 18px;
+        border: 2px dashed #9cb79e;
+        background: #f8fbf3;
+        border-radius: 8px;
+      }
+
+      .drop input {
+        width: 100%;
+      }
+
+      .sample {
+        width: 100%;
+        margin-top: 10px;
+        padding: 10px 12px;
+        border-radius: 7px;
+        color: white;
+        background: var(--accent);
+      }
+
+      .controls {
+        display: grid;
+        gap: 12px;
+        margin-top: 14px;
+      }
+
+      label {
+        display: grid;
+        gap: 6px;
+        color: #3d473c;
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      select,
+      input,
+      textarea {
+        width: 100%;
+        min-height: 40px;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        padding: 8px 10px;
+        color: var(--ink);
+        background: white;
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 72px;
+      }
+
+      .actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 14px;
+      }
+
+      .actions button,
+      .wide-button {
+        padding: 10px 12px;
+        border-radius: 7px;
+        color: white;
+        background: var(--accent-dark);
+        font-weight: 800;
+      }
+
+      .actions .secondary,
+      .wide-button.secondary {
+        color: var(--accent-dark);
+        background: #dce9d7;
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        margin-top: 18px;
+      }
+
+      .stat {
+        padding: 10px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: white;
+      }
+
+      .stat strong {
+        display: block;
+        font-size: 22px;
+      }
+
+      .stat span {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .editor {
+        margin-top: 14px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fbfdf8;
+      }
+
+      .preview-head {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 18px;
+      }
+
+      .preview-head h2 {
+        margin: 0;
+        font-size: 24px;
+      }
+
+      .card-grid {
+        display: grid;
+        gap: 12px;
+      }
+
+      .layout-8 {
+        grid-template-columns: repeat(2, minmax(220px, 1fr));
+      }
+
+      .layout-6 {
+        grid-template-columns: repeat(2, minmax(260px, 1fr));
+      }
+
+      .layout-large {
+        grid-template-columns: minmax(320px, 680px);
+        justify-content: center;
+      }
+
+      .word-card {
+        min-height: 210px;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        gap: 12px;
+        padding: 16px;
+        border: 1.5px solid #1d271e;
+        border-radius: 8px;
+        background: white;
+        break-inside: avoid;
+      }
+
+      .layout-6 .word-card {
+        min-height: 250px;
+      }
+
+      .layout-large .word-card {
+        min-height: 520px;
+        padding: 34px;
+      }
+
+      .meta {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .word {
+        align-self: center;
+        text-align: center;
+      }
+
+      .tribal {
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: clamp(34px, 5vw, 62px);
+        line-height: 1.08;
+        overflow-wrap: anywhere;
+      }
+
+      .layout-large .tribal {
+        font-size: clamp(58px, 8vw, 104px);
+      }
+
+      .chinese {
+        margin-top: 14px;
+        font-size: 28px;
+        font-weight: 800;
+      }
+
+      .note {
+        min-height: 22px;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+
+      .list {
+        display: grid;
+        gap: 8px;
+        max-height: 260px;
+        overflow: auto;
+        margin-top: 12px;
+        padding-right: 4px;
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 10px;
+        align-items: center;
+        padding: 10px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: white;
+      }
+
+      .row strong {
+        display: block;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 20px;
+      }
+
+      .row span {
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .row button {
+        padding: 7px 10px;
+        border-radius: 6px;
+        color: var(--accent-dark);
+        background: #e6efe0;
+        font-weight: 800;
+      }
+
+      .empty {
+        padding: 24px;
+        border: 1px dashed var(--line);
+        border-radius: 8px;
+        background: white;
+        color: var(--muted);
+        text-align: center;
+      }
+
+      @media (max-width: 900px) {
+        .app {
+          grid-template-columns: 1fr;
+        }
+
+        aside {
+          border-right: 0;
+          border-bottom: 1px solid var(--line);
+        }
+      }
+
+      @page {
+        size: A4 portrait;
+        margin: 10mm;
+      }
+
+      @media print {
+        body {
+          background: white;
+        }
+
+        aside,
+        .preview-head {
+          display: none;
+        }
+
+        .app {
+          display: block;
+        }
+
+        main {
+          padding: 0;
+          overflow: visible;
+        }
+
+        .card-grid {
+          gap: 4mm;
+        }
+
+        .layout-8 {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .layout-8 .word-card {
+          height: 64mm;
+          min-height: 0;
+        }
+
+        .layout-6 {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .layout-6 .word-card {
+          height: 84mm;
+          min-height: 0;
+        }
+
+        .layout-large {
+          grid-template-columns: 1fr;
+        }
+
+        .layout-large .word-card {
+          height: 267mm;
+          min-height: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <aside>
+        <a class="back" href="../../index.html">回到 AI 基地</a>
+        <h1>南勢阿美語詞卡產生器</h1>
+        <p>上傳 2022 學習詞表，快速做成可列印的族語詞卡。主題分類會自動從「類別」列判斷。</p>
+
+        <section class="drop">
+          <label>
+            上傳 Excel 詞表
+            <input id="fileInput" type="file" accept=".xlsx,.xls,.csv" />
+          </label>
+          <button class="sample" id="loadSample" type="button">先載入示範資料</button>
+        </section>
+
+        <div class="stats">
+          <div class="stat"><strong id="totalCount">0</strong><span>全部詞卡</span></div>
+          <div class="stat"><strong id="showCount">0</strong><span>目前顯示</span></div>
+          <div class="stat"><strong id="categoryCount">0</strong><span>主題分類</span></div>
+        </div>
+
+        <section class="controls">
+          <h2>篩選與版面</h2>
+          <label>
+            關鍵字
+            <input id="searchInput" placeholder="搜尋族語、中文、編號" />
+          </label>
+          <label>
+            主題分類
+            <select id="categoryFilter"></select>
+          </label>
+          <label>
+            級別
+            <select id="levelFilter"></select>
+          </label>
+          <label>
+            列印版面
+            <select id="layoutSelect">
+              <option value="layout-8">A4 一頁 8 張</option>
+              <option value="layout-6">A4 一頁 6 張</option>
+              <option value="layout-large">單張大卡</option>
+            </select>
+          </label>
+          <label>
+            最多顯示
+            <select id="limitSelect">
+              <option value="8">8 張</option>
+              <option value="24">24 張</option>
+              <option value="60">60 張</option>
+              <option value="9999">全部</option>
+            </select>
+          </label>
+        </section>
+
+        <div class="actions">
+          <button id="printCards" type="button">列印詞卡</button>
+          <button class="secondary" id="copyTemplate" type="button">複製範本</button>
+          <button class="secondary" id="downloadTemplate" type="button">下載範本</button>
+          <button class="secondary" id="addCard" type="button">新增詞卡</button>
+        </div>
+
+        <section class="editor">
+          <h2>編輯選取詞卡</h2>
+          <div class="controls">
+            <label>族語<input id="editTribal" /></label>
+            <label>中文<input id="editChinese" /></label>
+            <label>主題分類<input id="editCategory" /></label>
+            <label>級別<input id="editLevel" /></label>
+            <label>編號<input id="editCode" /></label>
+            <label>備註<textarea id="editNote"></textarea></label>
+          </div>
+          <button class="wide-button" id="saveEdit" type="button">套用修改</button>
+        </section>
+
+        <section>
+          <h2>詞卡清單</h2>
+          <div class="list" id="cardList"></div>
+        </section>
+      </aside>
+
+      <main>
+        <div class="preview-head">
+          <div>
+            <h2>列印預覽</h2>
+            <p id="statusText">請先上傳 Excel，或載入示範資料。</p>
+          </div>
+        </div>
+        <div id="cards" class="card-grid layout-8"></div>
+      </main>
+    </div>
+
+    <script>
+      const sampleCards = [
+        { no: "1", code: "01-01", chinese: "一", tribal: "cacay", note: "", level: "初級", category: "01數字計量" },
+        { no: "2", code: "01-02", chinese: "二", tribal: "tusa", note: "", level: "初級", category: "01數字計量" },
+        { no: "80", code: "04-01", chinese: "爸爸", tribal: "ama", note: "", level: "初級", category: "04親屬稱謂" },
+        { no: "81", code: "04-02", chinese: "媽媽", tribal: "ina", note: "", level: "初級", category: "04親屬稱謂" },
+        { no: "214", code: "07-01", chinese: "狗", tribal: "wacu", note: "", level: "初級", category: "07動物(含昆蟲)" },
+        { no: "315", code: "13-01", chinese: "今天", tribal: "cingra", note: "", level: "初級", category: "13時間" }
+      ];
+
+      const templateCsv = `序號,編號,中文,族語,備註,級別,主題分類
+1,01-01,一,cacay,,初級,01數字計量
+2,01-02,二,tusa,,初級,01數字計量
+80,04-01,爸爸,ama,,初級,04親屬稱謂`;
+
+      let cards = [];
+      let filtered = [];
+      let selectedId = null;
+
+      const $ = (id) => document.querySelector(id);
+
+      function normalize(value) {
+        return value == null ? "" : String(value).trim();
+      }
+
+      function makeId() {
+        return Math.random().toString(36).slice(2) + Date.now().toString(36);
+      }
+
+      function loadCards(nextCards) {
+        cards = nextCards.map((card) => ({ id: card.id || makeId(), ...card }));
+        selectedId = cards[0]?.id || null;
+        refreshOptions();
+        render();
+        fillEditor();
+      }
+
+      function parseRows(rows) {
+        let currentCategory = "";
+        const parsed = [];
+
+        rows.forEach((row) => {
+          const values = row.map(normalize);
+          const first = values[0];
+          const second = values[1];
+
+          if (first === "類別" || (first && !/^\d+$/.test(first) && /^\d{2}/.test(second))) {
+            currentCategory = second;
+            return;
+          }
+
+          if (/^\d+$/.test(first) && values[2] && values[3]) {
+            parsed.push({
+              id: makeId(),
+              no: first,
+              code: second,
+              chinese: values[2],
+              tribal: values[3],
+              note: values[4],
+              level: values[5],
+              category: values[6] || currentCategory || inferCategory(second)
+            });
+          }
+        });
+
+        return parsed;
+      }
+
+      function inferCategory(code) {
+        const map = {
+          "01": "01數字計量",
+          "02": "02代名詞、指示詞",
+          "03": "03疑問詞",
+          "04": "04親屬稱謂",
+          "05": "05人物、身分",
+          "06": "06身體部位",
+          "07": "07動物(含昆蟲)",
+          "08": "08植物",
+          "09": "09物品(不含食品)",
+          "10": "10山川地理",
+          "11": "11自然景觀",
+          "12": "12建築",
+          "13": "13時間",
+          "14": "14空間",
+          "15": "15農耕",
+          "16": "16狩獵",
+          "17": "17宗教",
+          "18": "18織布服飾",
+          "19": "19傳統文化與習俗",
+          "20": "20交通",
+          "21": "21食物(非植物)",
+          "22": "22顏色",
+          "23": "23聲音",
+          "24": "24抽象名詞",
+          "25": "25行動",
+          "26": "26肢體動作",
+          "27": "27飲食",
+          "28": "28認知感官",
+          "29": "29情緒思維",
+          "30": "30生活作息",
+          "31": "31生老病死傷",
+          "32": "32特徵",
+          "33": "33助動詞",
+          "34": "34其他",
+          "35": "35否定詞",
+          "36": "36助詞或其他"
+        };
+        return map[normalize(code).slice(0, 2)] || "未分類";
+      }
+
+      function refreshOptions() {
+        const categories = unique(cards.map((card) => card.category).filter(Boolean));
+        const levels = unique(cards.map((card) => card.level).filter(Boolean));
+        fillSelect("#categoryFilter", ["全部主題", ...categories]);
+        fillSelect("#levelFilter", ["全部級別", ...levels]);
+      }
+
+      function unique(list) {
+        return [...new Set(list)].sort((a, b) => a.localeCompare(b, "zh-Hant"));
+      }
+
+      function fillSelect(selector, values) {
+        const select = $(selector);
+        const current = select.value;
+        select.innerHTML = values.map((value) => `<option>${escapeHtml(value)}</option>`).join("");
+        if (values.includes(current)) select.value = current;
+      }
+
+      function getFilteredCards() {
+        const search = $("#searchInput").value.trim().toLowerCase();
+        const category = $("#categoryFilter").value;
+        const level = $("#levelFilter").value;
+
+        return cards.filter((card) => {
+          const text = [card.tribal, card.chinese, card.code, card.note, card.category, card.level].join(" ").toLowerCase();
+          const matchSearch = !search || text.includes(search);
+          const matchCategory = category === "全部主題" || !category || card.category === category;
+          const matchLevel = level === "全部級別" || !level || card.level === level;
+          return matchSearch && matchCategory && matchLevel;
+        });
+      }
+
+      function render() {
+        filtered = getFilteredCards();
+        const limit = Number($("#limitSelect").value);
+        const visible = filtered.slice(0, limit);
+        const layout = $("#layoutSelect").value;
+
+        $("#cards").className = `card-grid ${layout}`;
+        $("#cards").innerHTML = visible.length ? visible.map(renderCard).join("") : `<div class="empty">沒有符合條件的詞卡。</div>`;
+        $("#cardList").innerHTML = visible.length ? visible.map(renderRow).join("") : `<div class="empty">尚無資料。</div>`;
+
+        $("#totalCount").textContent = cards.length;
+        $("#showCount").textContent = filtered.length;
+        $("#categoryCount").textContent = unique(cards.map((card) => card.category).filter(Boolean)).length;
+        $("#statusText").textContent = cards.length
+          ? `目前篩選出 ${filtered.length} 張詞卡，預覽顯示 ${visible.length} 張。`
+          : "請先上傳 Excel，或載入示範資料。";
+      }
+
+      function renderCard(card) {
+        return `<article class="word-card">
+          <div class="meta">
+            <span>${escapeHtml(card.category || "未分類")}</span>
+            <span>${escapeHtml(card.level || "")}</span>
+          </div>
+          <div class="word">
+            <div class="tribal">${escapeHtml(card.tribal)}</div>
+            <div class="chinese">${escapeHtml(card.chinese)}</div>
+          </div>
+          <div class="note">
+            <strong>${escapeHtml(card.code || card.no || "")}</strong>
+            ${card.note ? `｜${escapeHtml(card.note)}` : ""}
+          </div>
+        </article>`;
+      }
+
+      function renderRow(card) {
+        return `<div class="row">
+          <div>
+            <strong>${escapeHtml(card.tribal)}</strong>
+            <span>${escapeHtml(card.chinese)}｜${escapeHtml(card.category || "未分類")}｜${escapeHtml(card.level || "")}</span>
+          </div>
+          <button type="button" data-edit="${card.id}">編輯</button>
+        </div>`;
+      }
+
+      function fillEditor() {
+        const card = cards.find((item) => item.id === selectedId);
+        $("#editTribal").value = card?.tribal || "";
+        $("#editChinese").value = card?.chinese || "";
+        $("#editCategory").value = card?.category || "";
+        $("#editLevel").value = card?.level || "";
+        $("#editCode").value = card?.code || "";
+        $("#editNote").value = card?.note || "";
+      }
+
+      function saveEdit() {
+        let card = cards.find((item) => item.id === selectedId);
+        if (!card) {
+          card = { id: makeId(), no: "", code: "", chinese: "", tribal: "", note: "", level: "", category: "" };
+          cards.unshift(card);
+          selectedId = card.id;
+        }
+        card.tribal = $("#editTribal").value.trim();
+        card.chinese = $("#editChinese").value.trim();
+        card.category = $("#editCategory").value.trim();
+        card.level = $("#editLevel").value.trim();
+        card.code = $("#editCode").value.trim();
+        card.note = $("#editNote").value.trim();
+        refreshOptions();
+        render();
+      }
+
+      function escapeHtml(value) {
+        return normalize(value).replace(/[&<>"']/g, (char) => ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#039;"
+        })[char]);
+      }
+
+      async function handleFile(file) {
+        if (!file) return;
+        const buffer = await file.arrayBuffer();
+        if (!window.XLSX) {
+          alert("讀取 Excel 的工具還沒載入完成，請稍後再試。");
+          return;
+        }
+        const workbook = XLSX.read(buffer, { type: "array" });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
+        const parsed = parseRows(rows);
+        if (!parsed.length) {
+          alert("沒有讀到詞卡資料，請確認檔案格式是否包含「中文、族語、級別」欄位。");
+          return;
+        }
+        loadCards(parsed);
+      }
+
+      $("#fileInput").addEventListener("change", (event) => handleFile(event.target.files[0]));
+      $("#loadSample").addEventListener("click", () => loadCards(sampleCards));
+
+      ["#searchInput", "#categoryFilter", "#levelFilter", "#layoutSelect", "#limitSelect"].forEach((selector) => {
+        $(selector).addEventListener("input", render);
+      });
+
+      $("#cardList").addEventListener("click", (event) => {
+        const button = event.target.closest("[data-edit]");
+        if (!button) return;
+        selectedId = button.dataset.edit;
+        fillEditor();
+      });
+
+      $("#saveEdit").addEventListener("click", saveEdit);
+      $("#addCard").addEventListener("click", () => {
+        const card = { id: makeId(), no: "", code: "", chinese: "中文", tribal: "族語", note: "", level: "初級", category: "自訂詞卡" };
+        cards.unshift(card);
+        selectedId = card.id;
+        refreshOptions();
+        render();
+        fillEditor();
+      });
+
+      $("#printCards").addEventListener("click", () => window.print());
+      $("#copyTemplate").addEventListener("click", async () => {
+        await navigator.clipboard.writeText(templateCsv);
+      });
+      $("#downloadTemplate").addEventListener("click", () => {
+        const blob = new Blob([templateCsv], { type: "text/csv;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "南勢阿美語詞卡範本.csv";
+        link.click();
+        URL.revokeObjectURL(url);
+      });
+
+      loadCards(sampleCards);
+    </script>
+  </body>
+</html>
