@@ -47,7 +47,7 @@
     <div class="max-w-7xl mx-auto py-8 px-4 no-print">
         <header class="text-center mb-8">
             <div class="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-bold text-amber-800">
-                版本更新時間：2026-05-13 21:39（台北時間）｜PDF 改用獨立列印視窗，領據個資不寫入程式碼
+                版本更新時間：2026-07-09 16:05（台北時間）｜鐘點費明細新增助教堂數與助教費用彙總
             </div>
             <div class="mb-4">
                 <a href="../../" class="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800">
@@ -62,14 +62,18 @@
         </header>
 
         <div id="uploadSection" class="bg-white rounded-xl shadow-sm p-6 mb-8 border border-slate-200">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-1">報表月份 (如：3月份、4-5月份)</label>
                     <input type="text" id="monthTitle" value="3月份" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">鐘點費單價 (每小時)</label>
-                    <input type="number" id="unitPrice" value="1000" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                    <label class="block text-sm font-medium text-slate-700 mb-1">老師鐘點費單價 (每小時)</label>
+                    <input type="number" id="unitPrice" value="1000" oninput="renderPaymentTable()" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">助教費單價 (每堂)</label>
+                    <input type="number" id="assistantUnitPrice" value="500" oninput="renderPaymentTable()" class="w-full px-4 py-2 border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
             </div>
 
@@ -377,6 +381,7 @@
             if (!container) return;
             const monthText = document.getElementById('monthTitle').value;
             const unitPrice = parseInt(document.getElementById('unitPrice').value) || 1000;
+            const assistantUnitPrice = parseInt(document.getElementById('assistantUnitPrice').value) || 0;
 
             let html = `
                 <h2 contenteditable="true" class="text-xl font-bold text-center mb-6 text-black outline-blue-300">115年度臺北市原住民族語中高級線上家教 ${monthText}師資鐘點費請領明細表</h2>
@@ -401,13 +406,28 @@
                     <tbody>
             `;
 
-            let overallTotal = 0;
+            let teacherTotal = 0;
+            const assistantTotals = {};
             Object.keys(currentTeacherGroups).sort().forEach((key, idx) => {
                 const group = currentTeacherGroups[key];
                 const info = teacherDB[key] || { id: "", addr: "", bank: "", tel: "", time: "", lang: group.lang };
                 const dates = Object.keys(group.dates).sort();
                 const totalPay = dates.length * 2 * unitPrice;
-                overallTotal += totalPay;
+                teacherTotal += totalPay;
+
+                const assistantName = (group.ta || "").trim();
+                if (assistantName) {
+                    if (!assistantTotals[assistantName]) {
+                        assistantTotals[assistantName] = {
+                            lessons: 0,
+                            teachers: [],
+                            dates: []
+                        };
+                    }
+                    assistantTotals[assistantName].lessons += dates.length;
+                    assistantTotals[assistantName].teachers.push(`${group.lang}-${group.displayName}`);
+                    dates.forEach(date => assistantTotals[assistantName].dates.push(`${group.lang}-${group.displayName} ${date}`));
+                }
 
                 const dateStr = dates.map(d => {
                     if (d.length === 4 && /^\d+$/.test(d)) {
@@ -438,7 +458,53 @@
             html += `
                     </tbody>
                 </table>
-                <div contenteditable="true" class="mt-4 text-right font-bold text-lg text-black outline-blue-300">總計申領金額：NT$ ${overallTotal}</div>
+            `;
+
+            const assistantRows = Object.keys(assistantTotals).sort().map((assistantName, idx) => {
+                const item = assistantTotals[assistantName];
+                const pay = item.lessons * assistantUnitPrice;
+                const teacherList = [...new Set(item.teachers)].join('<br>');
+                const dateList = item.dates.join('<br>');
+
+                return `
+                    <tr>
+                        <td contenteditable="true" class="border border-black p-1 text-center">${idx + 1}</td>
+                        <td contenteditable="true" class="border border-black p-1 text-center font-bold">${assistantName}</td>
+                        <td contenteditable="true" class="border border-black p-1 text-center leading-tight">${teacherList}</td>
+                        <td contenteditable="true" class="border border-black p-1 text-center leading-tight">${dateList}</td>
+                        <td contenteditable="true" class="border border-black p-1 text-center">${item.lessons}</td>
+                        <td contenteditable="true" class="border border-black p-1 text-center">${assistantUnitPrice}</td>
+                        <td contenteditable="true" class="border border-black p-1 text-center font-bold">${pay}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            const assistantTotal = Object.values(assistantTotals).reduce((sum, item) => sum + item.lessons * assistantUnitPrice, 0);
+            const overallTotal = teacherTotal + assistantTotal;
+
+            html += `
+                <h2 contenteditable="true" class="text-xl font-bold text-center mt-10 mb-6 text-black outline-blue-300">115年度臺北市原住民族語中高級線上家教 ${monthText}助教費用明細表</h2>
+                <table class="w-full text-[11px] border-collapse border border-black text-black">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th contenteditable="true" class="border border-black p-1">序號</th>
+                            <th contenteditable="true" class="border border-black p-1">助教</th>
+                            <th contenteditable="true" class="border border-black p-1">協助課程</th>
+                            <th contenteditable="true" class="border border-black p-1 w-40">上課日期</th>
+                            <th contenteditable="true" class="border border-black p-1">堂數</th>
+                            <th contenteditable="true" class="border border-black p-1">單價</th>
+                            <th contenteditable="true" class="border border-black p-1">助教費</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${assistantRows || '<tr><td colspan="7" class="border border-black p-3 text-center text-slate-500">尚未填寫助教資料</td></tr>'}
+                    </tbody>
+                </table>
+                <div class="mt-4 grid gap-1 text-right font-bold text-black">
+                    <div contenteditable="true" class="outline-blue-300">老師鐘點費小計：NT$ ${teacherTotal}</div>
+                    <div contenteditable="true" class="outline-blue-300">助教費小計：NT$ ${assistantTotal}</div>
+                    <div contenteditable="true" class="text-lg outline-blue-300">總計申領金額：NT$ ${overallTotal}</div>
+                </div>
             `;
             container.innerHTML = html;
         }
