@@ -200,9 +200,10 @@
       display: grid;
       gap: 12px;
       position: sticky;
-      top: 8px;
-      z-index: 5;
+      top: 0;
+      z-index: 50;
       border-width: 2px;
+      scroll-margin-top: 0;
     }
 
     .segment {
@@ -423,7 +424,8 @@
       }
 
       .stage {
-        position: static;
+        position: sticky;
+        top: 0;
       }
 
       .line-text {
@@ -702,7 +704,22 @@
         });
       });
 
-      cueList.querySelector(".cue.active")?.scrollIntoView({ block: "nearest" });
+      keepActiveCueVisible();
+    }
+
+    function keepActiveCueVisible() {
+      const activeCue = cueList.querySelector(".cue.active");
+      if (!activeCue) return;
+      const listTop = cueList.scrollTop;
+      const listBottom = listTop + cueList.clientHeight;
+      const cueTop = activeCue.offsetTop;
+      const cueBottom = cueTop + activeCue.offsetHeight;
+
+      if (cueTop < listTop) {
+        cueList.scrollTop = Math.max(cueTop - 8, 0);
+      } else if (cueBottom > listBottom) {
+        cueList.scrollTop = cueBottom - cueList.clientHeight + 8;
+      }
     }
 
     function renderSegments() {
@@ -868,8 +885,14 @@
 
     window.addEventListener("keydown", event => {
       if (["TEXTAREA", "INPUT", "SELECT"].includes(document.activeElement.tagName)) return;
-      if (event.key === "ArrowRight") go(1);
-      if (event.key === "ArrowLeft") go(-1);
+      if (event.key === "ArrowRight") {
+        event.preventDefault();
+        go(1);
+      }
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        go(-1);
+      }
       if (event.key.toLowerCase() === "m") toggleMark();
       if (event.key.toLowerCase() === "c") copyCurrent();
       if (event.code === "Space") {
