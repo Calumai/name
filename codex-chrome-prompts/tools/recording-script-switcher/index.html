@@ -208,7 +208,8 @@
       grid-row: 1;
       min-height: 0;
       display: grid;
-      gap: 12px;
+      gap: 8px;
+      padding: 12px;
       position: relative;
       z-index: 50;
       border-width: 2px;
@@ -250,15 +251,15 @@
       border: 1px solid var(--line);
       border-radius: 8px;
       background: #fff;
-      padding: clamp(18px, 3vw, 34px);
+      padding: clamp(12px, 2vw, 20px);
       display: grid;
       align-content: center;
-      min-height: clamp(210px, 32vh, 420px);
+      min-height: clamp(64px, 11vh, 120px);
     }
 
     .line-text {
       margin: 0;
-      font-size: clamp(38px, 5.4vw, 76px);
+      font-size: clamp(22px, 2.9vw, 36px);
       line-height: 1.18;
       letter-spacing: 0;
       overflow-wrap: anywhere;
@@ -275,8 +276,30 @@
       background: #fff;
       border: 1px solid var(--line);
       border-radius: 8px;
-      padding: 12px;
+      padding: 8px 10px;
       color: var(--muted);
+      min-height: 52px;
+    }
+
+    body.recording-mode .stage {
+      gap: 12px;
+      padding: 16px;
+    }
+
+    body.recording-mode .line-box {
+      padding: clamp(18px, 3vw, 34px);
+      min-height: clamp(230px, 36vh, 460px);
+    }
+
+    body.recording-mode .line-text {
+      font-size: clamp(42px, 6vw, 84px);
+    }
+
+    body.recording-mode .app {
+      grid-template-rows: auto minmax(0, 1fr);
+    }
+
+    body.recording-mode .preview {
       min-height: 92px;
     }
 
@@ -289,7 +312,7 @@
     .controls {
       order: 0;
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: repeat(6, 1fr);
       gap: 8px;
     }
 
@@ -308,7 +331,7 @@
     }
 
     .script-input textarea {
-      min-height: 220px;
+      min-height: 180px;
     }
 
     .script-input {
@@ -475,6 +498,10 @@
       }
 
       .line-box {
+        min-height: 120px;
+      }
+
+      body.recording-mode .line-box {
         min-height: 240px;
       }
 
@@ -510,17 +537,26 @@
       }
 
       .line-box {
-        min-height: clamp(170px, 28vh, 300px);
-        padding: 20px;
+        min-height: clamp(60px, 10vh, 112px);
+        padding: 12px 16px;
       }
 
       .line-text {
-        font-size: clamp(34px, 5vw, 64px);
+        font-size: clamp(22px, 2.8vw, 34px);
       }
 
       .preview {
-        min-height: 72px;
-        padding: 10px;
+        min-height: 50px;
+        padding: 8px 10px;
+      }
+
+      body.recording-mode .line-box {
+        min-height: clamp(210px, 34vh, 360px);
+        padding: 20px;
+      }
+
+      body.recording-mode .line-text {
+        font-size: clamp(40px, 5.6vw, 72px);
       }
     }
   </style>
@@ -589,6 +625,7 @@
           <button class="primary" type="button" id="nextBtn">下一句</button>
           <button class="danger" type="button" id="markBtn">標記重錄</button>
           <button class="warn" type="button" id="copyBtn">複製目前句</button>
+          <button type="button" id="modeBtn">錄音模式</button>
           <button type="button" id="fullscreenBtn">全螢幕</button>
         </div>
       </section>
@@ -675,6 +712,7 @@
     const nextText = document.querySelector("#nextText");
     const markedList = document.querySelector("#markedList");
     const timerDisplay = document.querySelector("#timer");
+    const modeBtn = document.querySelector("#modeBtn");
     const storageKey = "recordingScriptSwitcherState";
 
     let cues = [];
@@ -682,6 +720,7 @@
     let marked = new Set();
     let timerSeconds = 0;
     let timerHandle = null;
+    let recordingMode = false;
 
     function parseScript(text) {
       const lines = text.replace(/\r/g, "").split("\n");
@@ -898,6 +937,13 @@
       return `${minutes}:${seconds}`;
     }
 
+    function setRecordingMode(enabled, persist = true) {
+      recordingMode = enabled;
+      document.body.classList.toggle("recording-mode", recordingMode);
+      modeBtn.textContent = recordingMode ? "編輯模式" : "錄音模式";
+      if (persist) saveState();
+    }
+
     function saveState() {
       const state = {
         script: scriptInput.value,
@@ -906,7 +952,8 @@
         activeIndex,
         marked: [...marked],
         cues,
-        timerSeconds
+        timerSeconds,
+        recordingMode
       };
       localStorage.setItem(storageKey, JSON.stringify(state));
     }
@@ -922,11 +969,13 @@
         activeIndex = Math.min(state.activeIndex || 0, Math.max(cues.length - 1, 0));
         marked = new Set(state.marked || []);
         timerSeconds = state.timerSeconds || 0;
+        recordingMode = Boolean(state.recordingMode);
         timerDisplay.textContent = formatTime(timerSeconds);
       } catch {
         scriptInput.value = sampleScript;
         cues = parseScript(sampleScript);
       }
+      setRecordingMode(recordingMode, false);
       renderAll();
     }
 
@@ -961,6 +1010,7 @@
     document.querySelector("#copyAllBtn").addEventListener("click", copyAllRecord);
     document.querySelector("#timerBtn").addEventListener("click", toggleTimer);
     document.querySelector("#resetTimerBtn").addEventListener("click", resetTimer);
+    modeBtn.addEventListener("click", () => setRecordingMode(!recordingMode));
     recordNote.addEventListener("input", saveState);
     episodeTitle.addEventListener("input", saveState);
     scriptInput.addEventListener("input", saveState);
