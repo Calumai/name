@@ -49,6 +49,11 @@
 
     button:hover { border-color: var(--accent); }
 
+    button.key-flash {
+      transform: translateY(1px);
+      box-shadow: inset 0 0 0 2px rgba(15, 118, 110, 0.22);
+    }
+
     button.primary {
       background: var(--accent);
       border-color: var(--accent);
@@ -456,6 +461,23 @@
       color: var(--ink);
     }
 
+    .btn-kbd {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 26px;
+      margin-right: 6px;
+      padding: 1px 6px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.28);
+      border: 1px solid rgba(31, 36, 32, 0.18);
+      font-weight: 900;
+    }
+
+    button:not(.primary) .btn-kbd {
+      background: #f7f3ea;
+    }
+
     @media (max-width: 1120px) {
       .app {
         grid-template-columns: 1fr;
@@ -621,8 +643,8 @@
         </div>
 
         <div class="controls">
-          <button type="button" id="prevBtn">上一句</button>
-          <button class="primary" type="button" id="nextBtn">下一句</button>
+          <button type="button" id="prevBtn" aria-keyshortcuts="ArrowLeft" title="鍵盤 ←"><span class="btn-kbd">←</span>上一句</button>
+          <button class="primary" type="button" id="nextBtn" aria-keyshortcuts="ArrowRight" title="鍵盤 →"><span class="btn-kbd">→</span>下一句</button>
           <button class="danger" type="button" id="markBtn">標記重錄</button>
           <button class="warn" type="button" id="copyBtn">複製目前句</button>
           <button type="button" id="modeBtn">錄音模式</button>
@@ -713,6 +735,8 @@
     const markedList = document.querySelector("#markedList");
     const timerDisplay = document.querySelector("#timer");
     const modeBtn = document.querySelector("#modeBtn");
+    const prevBtn = document.querySelector("#prevBtn");
+    const nextBtn = document.querySelector("#nextBtn");
     const storageKey = "recordingScriptSwitcherState";
 
     let cues = [];
@@ -872,6 +896,18 @@
       saveState();
     }
 
+    function flashButton(button) {
+      button.classList.add("key-flash");
+      window.setTimeout(() => button.classList.remove("key-flash"), 120);
+    }
+
+    function navigateCue(delta, source = "button") {
+      go(delta);
+      if (source === "keyboard") {
+        flashButton(delta > 0 ? nextBtn : prevBtn);
+      }
+    }
+
     function toggleMark() {
       const cue = cues[activeIndex];
       if (!cue) return;
@@ -994,8 +1030,8 @@
       scriptInput.value = sampleScript;
       parseAndRender();
     });
-    document.querySelector("#prevBtn").addEventListener("click", () => go(-1));
-    document.querySelector("#nextBtn").addEventListener("click", () => go(1));
+    prevBtn.addEventListener("click", () => navigateCue(-1));
+    nextBtn.addEventListener("click", () => navigateCue(1));
     document.querySelector("#markBtn").addEventListener("click", toggleMark);
     document.querySelector("#copyBtn").addEventListener("click", copyCurrent);
     document.querySelector("#fullscreenBtn").addEventListener("click", () => {
@@ -1028,11 +1064,11 @@
       if (["TEXTAREA", "INPUT", "SELECT"].includes(document.activeElement.tagName)) return;
       if (event.key === "ArrowRight") {
         event.preventDefault();
-        go(1);
+        navigateCue(1, "keyboard");
       }
       if (event.key === "ArrowLeft") {
         event.preventDefault();
-        go(-1);
+        navigateCue(-1, "keyboard");
       }
       if (event.key.toLowerCase() === "m") toggleMark();
       if (event.key.toLowerCase() === "c") copyCurrent();
