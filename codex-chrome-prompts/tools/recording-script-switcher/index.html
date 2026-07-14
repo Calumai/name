@@ -112,7 +112,7 @@
 
     .app {
       display: grid;
-      grid-template-columns: minmax(320px, 420px) minmax(0, 1fr) minmax(280px, 360px);
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       gap: 14px;
       align-items: start;
     }
@@ -194,10 +194,15 @@
     }
 
     .stage {
-      min-height: 520px;
+      order: -1;
+      grid-column: 1 / -1;
+      min-height: 0;
       display: grid;
-      grid-template-rows: auto auto minmax(0, 1fr) auto;
       gap: 12px;
+      position: sticky;
+      top: 8px;
+      z-index: 5;
+      border-width: 2px;
     }
 
     .segment {
@@ -232,24 +237,26 @@
     }
 
     .line-box {
+      order: 2;
       border: 1px solid var(--line);
       border-radius: 8px;
       background: #fff;
       padding: clamp(18px, 3vw, 34px);
       display: grid;
       align-content: center;
-      min-height: 300px;
+      min-height: clamp(280px, 46vh, 560px);
     }
 
     .line-text {
       margin: 0;
-      font-size: clamp(30px, 5vw, 62px);
-      line-height: 1.24;
+      font-size: clamp(42px, 6vw, 84px);
+      line-height: 1.18;
       letter-spacing: 0;
       overflow-wrap: anywhere;
     }
 
     .next-box {
+      order: 3;
       display: grid;
       gap: 8px;
       grid-template-columns: 1fr 1fr;
@@ -271,9 +278,37 @@
     }
 
     .controls {
+      order: 0;
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(5, 1fr);
       gap: 8px;
+    }
+
+    .stage > .row {
+      order: 1;
+    }
+
+    .recorder-panel {
+      grid-column: 1 / -1;
+    }
+
+    .script-input textarea {
+      min-height: 220px;
+    }
+
+    .stage:fullscreen {
+      background: #f5f1e8;
+      padding: 22px;
+      display: grid;
+      align-content: stretch;
+    }
+
+    .stage:fullscreen .line-box {
+      min-height: 68vh;
+    }
+
+    .stage:fullscreen .line-text {
+      font-size: clamp(54px, 8vw, 118px);
     }
 
     .list {
@@ -386,6 +421,14 @@
       .line-box {
         min-height: 240px;
       }
+
+      .stage {
+        position: static;
+      }
+
+      .line-text {
+        font-size: clamp(32px, 10vw, 54px);
+      }
     }
   </style>
 </head>
@@ -407,7 +450,7 @@
     </div>
 
     <main class="app">
-      <aside class="panel stack">
+      <aside class="panel stack script-input">
         <h2>逐字稿輸入</h2>
         <p class="muted">支援 `### 段落`、`林J：`、`祥如：`、`音效：` 這種格式。貼上後按「解析逐字稿」。</p>
 
@@ -453,6 +496,7 @@
           <button class="primary" type="button" id="nextBtn">下一句</button>
           <button class="danger" type="button" id="markBtn">標記重錄</button>
           <button class="warn" type="button" id="copyBtn">複製目前句</button>
+          <button type="button" id="fullscreenBtn">全螢幕</button>
         </div>
       </section>
 
@@ -491,7 +535,7 @@
       </aside>
     </main>
 
-    <section class="panel" style="margin-top: 14px;">
+    <section class="panel recorder-panel" style="margin-top: 14px;">
       <h2>逐字稿句子列表</h2>
       <p class="muted">錄音時可以直接點任何一句跳轉。紅色是已標記要重錄的句子。</p>
       <div id="cueList" class="list"></div>
@@ -797,6 +841,14 @@
     document.querySelector("#nextBtn").addEventListener("click", () => go(1));
     document.querySelector("#markBtn").addEventListener("click", toggleMark);
     document.querySelector("#copyBtn").addEventListener("click", copyCurrent);
+    document.querySelector("#fullscreenBtn").addEventListener("click", () => {
+      const stage = document.querySelector(".stage");
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      } else {
+        stage.requestFullscreen?.();
+      }
+    });
     document.querySelector("#copyMarkedBtn").addEventListener("click", copyMarked);
     document.querySelector("#copyAllBtn").addEventListener("click", copyAllRecord);
     document.querySelector("#timerBtn").addEventListener("click", toggleTimer);
