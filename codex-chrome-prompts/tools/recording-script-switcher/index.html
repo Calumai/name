@@ -1,0 +1,832 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>錄音逐字稿切換器｜母語巢Radio</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f1e8;
+      --ink: #1f2420;
+      --muted: #66706b;
+      --panel: #fffdf8;
+      --line: #d8d0bf;
+      --accent: #0f766e;
+      --accent-dark: #0a5d57;
+      --orange: #eb7200;
+      --red: #b42318;
+      --green-soft: #e5f2ed;
+      --orange-soft: #fff1e4;
+      --shadow: 0 18px 42px rgba(42, 35, 24, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(15, 118, 110, 0.14), transparent 34rem),
+        linear-gradient(135deg, #f8f5ee 0%, #efe8d8 100%);
+      color: var(--ink);
+      font-family: "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+      line-height: 1.55;
+    }
+
+    button, textarea, input, select {
+      font: inherit;
+    }
+
+    button {
+      min-height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      cursor: pointer;
+    }
+
+    button:hover { border-color: var(--accent); }
+
+    button.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+      font-weight: 800;
+    }
+
+    button.warn {
+      background: var(--orange);
+      border-color: var(--orange);
+      color: #1d1105;
+      font-weight: 800;
+    }
+
+    button.danger {
+      background: #fff5f3;
+      border-color: #efb3aa;
+      color: var(--red);
+      font-weight: 800;
+    }
+
+    .shell {
+      width: min(1440px, calc(100% - 24px));
+      margin: 0 auto;
+      padding: 18px 0 28px;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 16px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(30px, 5vw, 56px);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      margin: 10px 0 0;
+      color: var(--muted);
+      max-width: 760px;
+    }
+
+    .back {
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      min-height: 42px;
+      padding: 8px 13px;
+      border-radius: 999px;
+      background: #fff;
+      border: 1px solid var(--line);
+      color: var(--ink);
+      white-space: nowrap;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: minmax(320px, 420px) minmax(0, 1fr) minmax(280px, 360px);
+      gap: 14px;
+      align-items: start;
+    }
+
+    .panel {
+      background: rgba(255, 253, 248, 0.94);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 16px;
+    }
+
+    .panel h2,
+    .panel h3 {
+      margin: 0;
+      letter-spacing: 0;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    textarea,
+    input,
+    select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      padding: 10px 12px;
+    }
+
+    textarea {
+      min-height: 300px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    label {
+      display: block;
+      margin: 12px 0 6px;
+      font-weight: 800;
+    }
+
+    .stack {
+      display: grid;
+      gap: 10px;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .row > * { flex: 1; }
+
+    .statusbar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .stat {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 26px;
+      color: var(--accent-dark);
+      line-height: 1;
+    }
+
+    .stage {
+      min-height: 520px;
+      display: grid;
+      grid-template-rows: auto auto minmax(0, 1fr) auto;
+      gap: 12px;
+    }
+
+    .segment {
+      width: fit-content;
+      max-width: 100%;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--green-soft);
+      color: var(--accent-dark);
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
+
+    .speaker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-weight: 900;
+      background: #1f2420;
+      color: #fff;
+    }
+
+    .speaker.sfx {
+      background: #54483a;
+    }
+
+    .speaker.note {
+      background: #34554d;
+    }
+
+    .line-box {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      padding: clamp(18px, 3vw, 34px);
+      display: grid;
+      align-content: center;
+      min-height: 300px;
+    }
+
+    .line-text {
+      margin: 0;
+      font-size: clamp(30px, 5vw, 62px);
+      line-height: 1.24;
+      letter-spacing: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .next-box {
+      display: grid;
+      gap: 8px;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .preview {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      color: var(--muted);
+      min-height: 92px;
+    }
+
+    .preview strong {
+      display: block;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .list {
+      display: grid;
+      gap: 8px;
+      max-height: 520px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .cue {
+      text-align: left;
+      border: 1px solid var(--line);
+      background: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      display: grid;
+      gap: 4px;
+    }
+
+    .cue.active {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.14);
+    }
+
+    .cue.marked {
+      border-color: #efb3aa;
+      background: #fff8f6;
+    }
+
+    .cue-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .cue-text {
+      color: var(--ink);
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+
+    .hint {
+      padding: 10px;
+      border: 1px dashed #cbbfa9;
+      border-radius: 8px;
+      background: #fffaf0;
+      color: #5e5549;
+      font-size: 14px;
+    }
+
+    .timer {
+      font-variant-numeric: tabular-nums;
+      font-size: 24px;
+      font-weight: 900;
+    }
+
+    .checklist {
+      margin: 0;
+      padding-left: 20px;
+      color: var(--muted);
+    }
+
+    .checklist li { margin: 6px 0; }
+
+    .marked-list {
+      min-height: 80px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .kbd {
+      display: inline-flex;
+      min-width: 28px;
+      justify-content: center;
+      padding: 2px 7px;
+      border-radius: 6px;
+      border: 1px solid var(--line);
+      background: #fff;
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    @media (max-width: 1120px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .stage {
+        min-height: auto;
+      }
+    }
+
+    @media (max-width: 720px) {
+      header {
+        grid-template-columns: 1fr;
+      }
+
+      .statusbar,
+      .next-box,
+      .controls {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .line-box {
+        min-height: 240px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div>
+        <h1>錄音逐字稿切換器</h1>
+        <p class="lead">給《母語巢Radio》錄音現場用：貼上逐字稿後，自動切成段落、講者與音效提示，錄音時用大字切換目前台詞。</p>
+      </div>
+      <a class="back" href="../../">回工具練習基地</a>
+    </header>
+
+    <div class="statusbar" aria-label="錄音狀態">
+      <div class="stat"><strong id="currentNumber">0</strong><span>目前句</span></div>
+      <div class="stat"><strong id="totalNumber">0</strong><span>總句數</span></div>
+      <div class="stat"><strong id="markedNumber">0</strong><span>重錄標記</span></div>
+      <div class="stat"><strong id="timer" class="timer">00:00</strong><span>錄音計時</span></div>
+    </div>
+
+    <main class="app">
+      <aside class="panel stack">
+        <h2>逐字稿輸入</h2>
+        <p class="muted">支援 `### 段落`、`林J：`、`祥如：`、`音效：` 這種格式。貼上後按「解析逐字稿」。</p>
+
+        <label for="scriptInput">錄音稿</label>
+        <textarea id="scriptInput" spellcheck="false"></textarea>
+
+        <div class="row">
+          <button class="primary" type="button" id="parseBtn">解析逐字稿</button>
+          <button type="button" id="sampleBtn">載入範例</button>
+        </div>
+
+        <label for="episodeTitle">本集標題</label>
+        <input id="episodeTitle" type="text" value="母語巢Radio 錄音稿">
+
+        <div class="hint">
+          快捷鍵：<span class="kbd">→</span> 下一句、<span class="kbd">←</span> 上一句、<span class="kbd">M</span> 標記重錄、<span class="kbd">C</span> 複製目前句、<span class="kbd">Space</span> 開始/暫停計時。
+        </div>
+      </aside>
+
+      <section class="panel stage" aria-live="polite">
+        <div class="row">
+          <span id="segmentLabel" class="segment">尚未解析</span>
+          <span id="speakerLabel" class="speaker">待開始</span>
+        </div>
+
+        <div class="line-box">
+          <p id="currentText" class="line-text">貼上逐字稿後，按「解析逐字稿」。</p>
+        </div>
+
+        <div class="next-box">
+          <div class="preview">
+            <strong>上一句</strong>
+            <span id="prevText">尚無</span>
+          </div>
+          <div class="preview">
+            <strong>下一句</strong>
+            <span id="nextText">尚無</span>
+          </div>
+        </div>
+
+        <div class="controls">
+          <button type="button" id="prevBtn">上一句</button>
+          <button class="primary" type="button" id="nextBtn">下一句</button>
+          <button class="danger" type="button" id="markBtn">標記重錄</button>
+          <button class="warn" type="button" id="copyBtn">複製目前句</button>
+        </div>
+      </section>
+
+      <aside class="panel stack">
+        <h2>錄音控制</h2>
+        <div class="row">
+          <button class="primary" type="button" id="timerBtn">開始計時</button>
+          <button type="button" id="resetTimerBtn">歸零</button>
+        </div>
+
+        <label for="segmentJump">跳到段落</label>
+        <select id="segmentJump"></select>
+
+        <label for="recordNote">現場備註</label>
+        <textarea id="recordNote" rows="5" style="min-height: 120px;" placeholder="例：03:12 祥如重錄 Siliq 發音；EP05 地名來源待查。"></textarea>
+
+        <div class="row">
+          <button type="button" id="copyMarkedBtn">複製重錄清單</button>
+          <button type="button" id="copyAllBtn">複製錄音紀錄</button>
+        </div>
+
+        <div>
+          <h3>重錄標記</h3>
+          <div id="markedList" class="marked-list">尚未標記。</div>
+        </div>
+
+        <div>
+          <h3>錄音前檢查</h3>
+          <ul class="checklist">
+            <li>每段族語詞、族別、故事版本已確認。</li>
+            <li>不確定來源的內容標示待查，不硬講。</li>
+            <li>手機或電腦保持勿擾模式。</li>
+            <li>先錄 20 秒測試檔，確認音量與環境音。</li>
+          </ul>
+        </div>
+      </aside>
+    </main>
+
+    <section class="panel" style="margin-top: 14px;">
+      <h2>逐字稿句子列表</h2>
+      <p class="muted">錄音時可以直接點任何一句跳轉。紅色是已標記要重錄的句子。</p>
+      <div id="cueList" class="list"></div>
+    </section>
+  </div>
+
+  <script>
+    const sampleScript = `### 片頭
+音效：都市夜晚聲，慢慢接入山林蟲鳴。
+
+林J：
+大家好，歡迎收聽《母語巢Radio》，我是林J。
+
+祥如：
+大家好，我是祥如。
+
+林J：
+今天我們要把逐字稿變成錄音現場可以切換的提詞畫面。
+
+祥如：
+重點不是把字變大而已，而是讓主持人知道現在是誰講、下一句是什麼、哪一句需要重錄。
+
+### 族語確認
+音效：短提示音。
+
+林J：
+每個傳說都要補族語詞，不能只講中文冷知識。
+
+祥如：
+如果族語詞還沒確認，就標示待查，不要硬編。`;
+
+    const scriptInput = document.querySelector("#scriptInput");
+    const episodeTitle = document.querySelector("#episodeTitle");
+    const cueList = document.querySelector("#cueList");
+    const segmentJump = document.querySelector("#segmentJump");
+    const recordNote = document.querySelector("#recordNote");
+    const currentNumber = document.querySelector("#currentNumber");
+    const totalNumber = document.querySelector("#totalNumber");
+    const markedNumber = document.querySelector("#markedNumber");
+    const segmentLabel = document.querySelector("#segmentLabel");
+    const speakerLabel = document.querySelector("#speakerLabel");
+    const currentText = document.querySelector("#currentText");
+    const prevText = document.querySelector("#prevText");
+    const nextText = document.querySelector("#nextText");
+    const markedList = document.querySelector("#markedList");
+    const timerDisplay = document.querySelector("#timer");
+    const storageKey = "recordingScriptSwitcherState";
+
+    let cues = [];
+    let activeIndex = 0;
+    let marked = new Set();
+    let timerSeconds = 0;
+    let timerHandle = null;
+
+    function parseScript(text) {
+      const lines = text.replace(/\r/g, "").split("\n");
+      const parsed = [];
+      let segment = "未分段";
+      let speaker = "旁白";
+      let pendingSpeaker = null;
+
+      for (const raw of lines) {
+        const line = raw.trim();
+        if (!line) continue;
+
+        if (/^#{1,4}\s+/.test(line)) {
+          segment = line.replace(/^#{1,4}\s+/, "").trim();
+          continue;
+        }
+
+        const speakerMatch = line.match(/^(.{1,16})[:：]$/);
+        if (speakerMatch) {
+          pendingSpeaker = speakerMatch[1].trim();
+          speaker = pendingSpeaker;
+          continue;
+        }
+
+        const inlineMatch = line.match(/^(.{1,16})[:：]\s*(.+)$/);
+        let cueSpeaker = speaker;
+        let textValue = line;
+
+        if (inlineMatch) {
+          cueSpeaker = inlineMatch[1].trim();
+          textValue = inlineMatch[2].trim();
+          speaker = cueSpeaker;
+        } else if (pendingSpeaker) {
+          cueSpeaker = pendingSpeaker;
+          pendingSpeaker = null;
+        }
+
+        if (/^(音效|音樂|備註|提示)$/.test(cueSpeaker)) {
+          cueSpeaker = cueSpeaker;
+        }
+
+        parsed.push({
+          id: crypto.randomUUID(),
+          segment,
+          speaker: cueSpeaker,
+          text: textValue
+        });
+      }
+
+      return parsed;
+    }
+
+    function parseAndRender() {
+      cues = parseScript(scriptInput.value);
+      activeIndex = 0;
+      marked = new Set();
+      renderAll();
+      saveState();
+    }
+
+    function renderAll() {
+      renderStage();
+      renderList();
+      renderSegments();
+      renderMarked();
+    }
+
+    function renderStage() {
+      const cue = cues[activeIndex];
+      currentNumber.textContent = cues.length ? activeIndex + 1 : 0;
+      totalNumber.textContent = cues.length;
+      markedNumber.textContent = marked.size;
+
+      if (!cue) {
+        segmentLabel.textContent = "尚未解析";
+        speakerLabel.textContent = "待開始";
+        speakerLabel.className = "speaker";
+        currentText.textContent = "貼上逐字稿後，按「解析逐字稿」。";
+        prevText.textContent = "尚無";
+        nextText.textContent = "尚無";
+        return;
+      }
+
+      segmentLabel.textContent = cue.segment;
+      speakerLabel.textContent = cue.speaker;
+      speakerLabel.className = `speaker ${speakerClass(cue.speaker)}`;
+      currentText.textContent = cue.text;
+      prevText.textContent = cues[activeIndex - 1] ? `${cues[activeIndex - 1].speaker}：${cues[activeIndex - 1].text}` : "尚無";
+      nextText.textContent = cues[activeIndex + 1] ? `${cues[activeIndex + 1].speaker}：${cues[activeIndex + 1].text}` : "尚無";
+    }
+
+    function speakerClass(speaker) {
+      if (speaker === "音效" || speaker === "音樂") return "sfx";
+      if (speaker === "備註" || speaker === "提示") return "note";
+      return "";
+    }
+
+    function renderList() {
+      cueList.innerHTML = cues.map((cue, index) => `
+        <button class="cue ${index === activeIndex ? "active" : ""} ${marked.has(cue.id) ? "marked" : ""}" type="button" data-index="${index}">
+          <span class="cue-meta"><span>${index + 1}. ${escapeHtml(cue.speaker)}</span><span>${escapeHtml(cue.segment)}</span></span>
+          <span class="cue-text">${escapeHtml(cue.text)}</span>
+        </button>
+      `).join("");
+
+      cueList.querySelectorAll("[data-index]").forEach(button => {
+        button.addEventListener("click", () => {
+          activeIndex = Number(button.dataset.index);
+          renderAll();
+          saveState();
+        });
+      });
+
+      cueList.querySelector(".cue.active")?.scrollIntoView({ block: "nearest" });
+    }
+
+    function renderSegments() {
+      const currentValue = segmentJump.value;
+      const segments = [...new Set(cues.map(cue => cue.segment))];
+      segmentJump.innerHTML = segments.map(segment => `<option value="${escapeHtml(segment)}">${escapeHtml(segment)}</option>`).join("");
+      if (segments.includes(currentValue)) segmentJump.value = currentValue;
+    }
+
+    function renderMarked() {
+      const items = cues.filter(cue => marked.has(cue.id));
+      markedList.innerHTML = items.length ? items.map(cue => `<div>${escapeHtml(cue.speaker)}｜${escapeHtml(cue.segment)}：${escapeHtml(cue.text)}</div>`).join("") : "尚未標記。";
+      markedNumber.textContent = marked.size;
+    }
+
+    function go(delta) {
+      if (!cues.length) return;
+      activeIndex = Math.min(Math.max(activeIndex + delta, 0), cues.length - 1);
+      renderAll();
+      saveState();
+    }
+
+    function toggleMark() {
+      const cue = cues[activeIndex];
+      if (!cue) return;
+      if (marked.has(cue.id)) {
+        marked.delete(cue.id);
+      } else {
+        marked.add(cue.id);
+      }
+      renderAll();
+      saveState();
+    }
+
+    async function copyCurrent() {
+      const cue = cues[activeIndex];
+      if (!cue) return;
+      await navigator.clipboard.writeText(`${cue.speaker}：${cue.text}`);
+    }
+
+    async function copyMarked() {
+      const text = cues
+        .filter(cue => marked.has(cue.id))
+        .map((cue, index) => `${index + 1}. ${cue.segment}｜${cue.speaker}：${cue.text}`)
+        .join("\n") || "尚未標記重錄句。";
+      await navigator.clipboard.writeText(text);
+    }
+
+    async function copyAllRecord() {
+      const markedText = cues
+        .filter(cue => marked.has(cue.id))
+        .map((cue, index) => `${index + 1}. ${cue.segment}｜${cue.speaker}：${cue.text}`)
+        .join("\n") || "無";
+      const text = `# ${episodeTitle.value || "母語巢Radio 錄音紀錄"}\n\n錄音時間：${formatTime(timerSeconds)}\n目前進度：${cues.length ? `${activeIndex + 1}/${cues.length}` : "0/0"}\n\n## 重錄標記\n${markedText}\n\n## 現場備註\n${recordNote.value.trim() || "無"}`;
+      await navigator.clipboard.writeText(text);
+    }
+
+    function toggleTimer() {
+      if (timerHandle) {
+        clearInterval(timerHandle);
+        timerHandle = null;
+        document.querySelector("#timerBtn").textContent = "開始計時";
+        return;
+      }
+      timerHandle = setInterval(() => {
+        timerSeconds += 1;
+        timerDisplay.textContent = formatTime(timerSeconds);
+        saveState();
+      }, 1000);
+      document.querySelector("#timerBtn").textContent = "暫停計時";
+    }
+
+    function resetTimer() {
+      clearInterval(timerHandle);
+      timerHandle = null;
+      timerSeconds = 0;
+      timerDisplay.textContent = "00:00";
+      document.querySelector("#timerBtn").textContent = "開始計時";
+      saveState();
+    }
+
+    function formatTime(total) {
+      const minutes = Math.floor(total / 60).toString().padStart(2, "0");
+      const seconds = (total % 60).toString().padStart(2, "0");
+      return `${minutes}:${seconds}`;
+    }
+
+    function saveState() {
+      const state = {
+        script: scriptInput.value,
+        title: episodeTitle.value,
+        note: recordNote.value,
+        activeIndex,
+        marked: [...marked],
+        cues,
+        timerSeconds
+      };
+      localStorage.setItem(storageKey, JSON.stringify(state));
+    }
+
+    function loadState() {
+      try {
+        const state = JSON.parse(localStorage.getItem(storageKey));
+        if (!state) throw new Error("empty");
+        scriptInput.value = state.script || sampleScript;
+        episodeTitle.value = state.title || "母語巢Radio 錄音稿";
+        recordNote.value = state.note || "";
+        cues = Array.isArray(state.cues) ? state.cues : parseScript(scriptInput.value);
+        activeIndex = Math.min(state.activeIndex || 0, Math.max(cues.length - 1, 0));
+        marked = new Set(state.marked || []);
+        timerSeconds = state.timerSeconds || 0;
+        timerDisplay.textContent = formatTime(timerSeconds);
+      } catch {
+        scriptInput.value = sampleScript;
+        cues = parseScript(sampleScript);
+      }
+      renderAll();
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "\"": "&quot;",
+        "'": "&#039;"
+      }[char]));
+    }
+
+    document.querySelector("#parseBtn").addEventListener("click", parseAndRender);
+    document.querySelector("#sampleBtn").addEventListener("click", () => {
+      scriptInput.value = sampleScript;
+      parseAndRender();
+    });
+    document.querySelector("#prevBtn").addEventListener("click", () => go(-1));
+    document.querySelector("#nextBtn").addEventListener("click", () => go(1));
+    document.querySelector("#markBtn").addEventListener("click", toggleMark);
+    document.querySelector("#copyBtn").addEventListener("click", copyCurrent);
+    document.querySelector("#copyMarkedBtn").addEventListener("click", copyMarked);
+    document.querySelector("#copyAllBtn").addEventListener("click", copyAllRecord);
+    document.querySelector("#timerBtn").addEventListener("click", toggleTimer);
+    document.querySelector("#resetTimerBtn").addEventListener("click", resetTimer);
+    recordNote.addEventListener("input", saveState);
+    episodeTitle.addEventListener("input", saveState);
+    scriptInput.addEventListener("input", saveState);
+
+    segmentJump.addEventListener("change", () => {
+      const nextIndex = cues.findIndex(cue => cue.segment === segmentJump.value);
+      if (nextIndex >= 0) {
+        activeIndex = nextIndex;
+        renderAll();
+        saveState();
+      }
+    });
+
+    window.addEventListener("keydown", event => {
+      if (["TEXTAREA", "INPUT", "SELECT"].includes(document.activeElement.tagName)) return;
+      if (event.key === "ArrowRight") go(1);
+      if (event.key === "ArrowLeft") go(-1);
+      if (event.key.toLowerCase() === "m") toggleMark();
+      if (event.key.toLowerCase() === "c") copyCurrent();
+      if (event.code === "Space") {
+        event.preventDefault();
+        toggleTimer();
+      }
+    });
+
+    loadState();
+  </script>
+</body>
+</html>
